@@ -1,0 +1,14 @@
+---
+import { experience } from "../data/portfolio";
+import ExperienceContent from "./sections/ExperienceContent.astro";
+---
+
+{
+  experience.length > 0 && (
+    <section id="experience" class="border-y border-border bg-surface/50">
+      <div class="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
+        <ExperienceContent />
+      </div>
+    </section>
+  )
+}

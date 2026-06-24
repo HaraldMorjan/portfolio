@@ -1,0 +1,239 @@
+{
+    "profile": {
+        "name": "Harald Morjan",
+        "role": "Senior Full-Stack Developer & Engineering Team Lead",
+        "tagline": "I've grown from a frontend specialist into a full-stack technical leader — architecting high-performance enterprise applications and mentoring the teams that ship them.",
+        "badges": ["11+ yrs experience", "Frontend Architecture", "React · JavaScript", ".NET · SQL Server", "MBA"],
+        "bio": "Senior Full-Stack Developer and Engineering Team Lead with nearly 12 years building, scaling, and maintaining high-performance enterprise applications across modern JavaScript, .NET, and SQL Server.",
+        "location": "Guatemala, Guatemala",
+        "about": [
+            "I am a Senior Full-Stack Developer and Engineering Team Lead with nearly 12 years of experience building, scaling, and maintaining high-performance enterprise applications.",
+            "Throughout my career, I've evolved from a dedicated frontend specialist into a full-stack technical leader. I don't just write clean, scalable code — I build and mentor the teams that do. My technical expertise spans modern JavaScript architectures, robust .NET backends, and complex SQL Server database integrations.",
+            "I hold an MBA with a focus on Project Management, which lets me bridge the gap between engineering and business. I understand that code is just a tool; the ultimate goal is to solve business problems, generate revenue, and deliver seamless user experiences. I partner effectively with product owners and stakeholders to translate business requirements into technical reality while managing technical debt and delivery timelines.",
+            "I am passionate about clean architecture, solving complex enterprise challenges, and building cultures of engineering excellence."
+        ],
+        "mobility": "Based in Guatemala with dual citizenship (including a German passport) — unrestricted work rights across the EU and ESTA visa-free travel to the US for business.",
+        "topSkills": [
+            "Software Architecture",
+            "Front-End Development",
+            "Technical Leadership",
+            "React.js",
+            ".NET Framework"
+        ],
+        "avatar": "",
+        "resumeUrl": ""
+    },
+    "socials": [
+        {
+            "label": "GitHub",
+            "href": "https://github.com/HaraldMorjan"
+        },
+        {
+            "label": "LinkedIn",
+            "href": "https://www.linkedin.com/in/harald-morjan-90108893/"
+        },
+        {
+            "label": "Email",
+            "href": "mailto:harald.morjan@gmail.com"
+        }
+    ],
+    "techStack": [
+        {
+            "category": "Frontend",
+            "description": "Crafting fast, consistent interfaces at enterprise scale.",
+            "items": [
+                "Astro",
+                "React",
+                "ExtJS",
+                "Vue",
+                "JavaScript",
+                "TypeScript",
+                "Tailwind CSS",
+                "Markdown",
+                "Material UI"
+            ]
+        },
+        {
+            "category": "Backend",
+            "description": "Robust services, APIs, and real-time systems.",
+            "items": [
+                "C#",
+                "Express.js",
+                "LINQ",
+                ".NET",
+                ".NET Core",
+                "Node.js",
+                "Firebase",
+                "MongoDB",
+                "MySQL",
+                "SQL Server",
+                "Socket.IO",
+                "SignalR"
+            ]
+        },
+        {
+            "category": "DevOps",
+            "description": "Version control and continuous delivery.",
+            "items": [
+                "GitHub",
+                "Azure DevOps"
+            ]
+        },
+        {
+            "category": "AI",
+            "description": "AI-assisted development.",
+            "items": [
+                "GitHub Copilot"
+            ]
+        },
+        {
+            "category": "Hosting",
+            "description": "Where I deploy and run things.",
+            "items": [
+                "Hostgator",
+                "Dondominio"
+            ]
+        }
+    ],
+    "projects": [
+        {
+            "title": "Toolbox",
+            "description": "A collection of utilities and experiments across different technologies, used as a personal reference and sandbox.",
+            "tags": [
+                "JavaScript",
+                "Tools"
+            ],
+            "repoUrl": "https://github.com/HaraldMorjan/toolbox",
+            "liveUrl": "",
+            "featured": true
+        },
+        {
+            "title": "MPAssistant",
+            "description": "An assistant application exploring automation and productivity workflows.",
+            "tags": [
+                "JavaScript"
+            ],
+            "repoUrl": "https://github.com/HaraldMorjan/Assistant",
+            "liveUrl": ""
+        },
+        {
+            "title": "Practice Projects",
+            "description": "A set of projects built to practice and explore new languages, frameworks, and patterns.",
+            "tags": [
+                "JavaScript",
+                "Learning"
+            ],
+            "repoUrl": "https://github.com/HaraldMorjan/projects",
+            "liveUrl": ""
+        }
+    ],
+    "experience": [
+        {
+            "role": "Senior Full-Stack Developer & Team Lead",
+            "company": "Plus Technologies & Innovations",
+            "period": "Jun 2023 - Present",
+            "location": "Guatemala · Remote",
+            "description": "Leading execution and architectural decisions for a critical enterprise software suite. Acting as the core bridge between business stakeholders and technical delivery.",
+            "highlights": [
+                "Engineering Leadership: Direct a cross-functional team, enforcing clean architecture and minimal-diff deployments via rigorous code reviews.",
+                "Architectural Delivery: Drive the modernization of full-stack features, ensuring seamless integration between .NET backends and complex SQL Server/Oracle databases.",
+                "Process Optimization: Championed Agile methodologies and Azure DevOps CI/CD pipelines, establishing Git hooks to streamline developer workflows.",
+                "Mentorship: Mentor developers in secure dynamic SQL generation, PII compliance, and modern JavaScript performance optimization."
+            ],
+            "skills": [
+                "Agile Methodologies",
+                "Software Architecture",
+                "SignalR",
+                "Astro",
+                ".NET Framework",
+                "Technical Leadership",
+                "Vue.js",
+                "Azure DevOps Services",
+                "Scrum",
+                "Microsoft SQL Server",
+                "Team Mentoring"
+            ]
+        },
+        {
+            "role": "Senior Full Stack Developer",
+            "company": "Plus Technologies & Innovations",
+            "period": "Jan 2022 - Jun 2023",
+            "location": "Guatemala · Remote",
+            "description": "Transitioned to full-stack responsibilities to architect end-to-end features, optimizing data flow from the database to the client UI.",
+            "highlights": [
+                "End-to-End Development: Engineered scalable features using C#/.NET for backend services and modern JavaScript for the frontend.",
+                "Data Engineering: Designed and optimized complex SQL queries and stored procedures, significantly improving data retrieval times for enterprise dashboards.",
+                "System Security: Implemented robust backend validations and secure data handling protocols to ensure enterprise compliance.",
+                "Cross-Team Collaboration: Worked directly with product teams to translate business requirements into technical specifications and scalable code."
+            ],
+            "skills": [
+                "RESTful Architecture",
+                ".NET Framework",
+                "Systems Engineering",
+                "Modern JavaScript",
+                "Microsoft SQL Server",
+                "C#"
+            ]
+        },
+        {
+            "role": "Senior Frontend Developer",
+            "company": "Plus Technologies & Innovations",
+            "period": "Jan 2019 - Dec 2021",
+            "location": "Guatemala · Remote",
+            "description": "Promoted to lead the frontend architecture for the enterprise suite, focusing on performance, scalability, and UI consistency across thousands of application screens.",
+            "highlights": [
+                "Frontend Architecture: Designed and implemented robust UI modules using ExtJS/Sencha, supporting complex data grids and dynamic workflows.",
+                "Global Solutions: Architected global override solutions and custom CSS frameworks to enforce visual consistency and eliminate redundant code across the application.",
+                "Performance Optimization: Identified and resolved UI bottlenecks, improving rendering times for data-heavy enterprise screens.",
+                "Code Standardization: Established frontend coding standards and led refactoring initiatives to transition legacy code to modern ES2015+ practices."
+            ],
+            "skills": [
+                "React.js",
+                "HTML5",
+                "JavaScript eXtension (JSX)",
+                "Front-end Engineering",
+                "Ext JS",
+                "Modern JavaScript",
+                "Web Performance",
+                "CSS"
+            ]
+        },
+        {
+            "role": "Frontend Developer",
+            "company": "Plus Technologies & Innovations",
+            "period": "Jan 2015 - Dec 2018",
+            "location": "Guatemala · On-site",
+            "description": "Developed and maintained core frontend features for financial and monitoring applications, ensuring high reliability and user accessibility.",
+            "highlights": [
+                "UI Development: Built interactive, responsive user interfaces translating design mockups into functional code.",
+                "API Integration: Collaborated with backend engineers to consume RESTful APIs, implementing secure data mapping and client-side error handling.",
+                "Bug Resolution: Triaged and resolved complex UI bugs in production environments, improving overall system stability.",
+                "Continuous Learning: Rapidly adapted to evolving frontend frameworks and internal tooling to support business delivery."
+            ],
+            "skills": [
+                "JavaScript",
+                "JSON",
+                "RESTful APIs",
+                "HTML",
+                "CSS",
+                "UI Development"
+            ]
+        },
+        {
+            "role": "Mobile Software Developer",
+            "company": "Plus Technologies & Innovations",
+            "period": "Aug 2014 - Jan 2015",
+            "location": "Guatemala · On-site",
+            "description": "Began my career at PlusTI focusing on mobile application development and foundational software engineering practices.",
+            "highlights": [
+                "Contributed to the development and testing of mobile features to support the broader enterprise ecosystem.",
+                "Participated in daily stand-ups and code reviews to ensure alignment with team standards."
+            ],
+            "skills": [
+                "Mobile User Experience",
+                "Mobile Application Development",
+                "Usability Engineering"
+            ]
+        }
+    ]
+}

@@ -1,0 +1,588 @@
+---
+// Theme Studio: a live design-token editor.
+// Overrides semantic CSS variables on <html> in real time, with presets,
+// a harmonious palette generator, font + radius controls, WCAG contrast
+// checks, copyable CSS export, persistence, and a shareable URL.
+//
+// Palettes are stored PER MODE (light + dark) so toggling dark mode keeps
+// working: each mode gets its own tinted background/surface/text derived from
+// the selected color.
+
+const colorFields = [
+  { key: "--bg", label: "Background" },
+  { key: "--surface", label: "Surface" },
+  { key: "--text", label: "Text" },
+  { key: "--muted", label: "Muted" },
+  { key: "--border", label: "Border" },
+  { key: "--accent", label: "Accent" },
+];
+
+const fonts = [
+  { label: "Inter", value: '"Inter", ui-sans-serif, system-ui, sans-serif' },
+  {
+    label: "System UI",
+    value: 'ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif',
+  },
+  { label: "Georgia (serif)", value: 'Georgia, "Times New Roman", serif' },
+  { label: "Mono", value: '"JetBrains Mono", ui-monospace, monospace' },
+];
+
+// name, accent color, neutral hue for the generated palette
+const presets = [
+  { name: "Default", reset: true, dot: "#1a66f0" },
+  { name: "Ocean", accent: "#0ea5e9", hue: 200, dot: "#0ea5e9" },
+  { name: "Sunset", accent: "#f97316", hue: 18, dot: "#f97316" },
+  { name: "Forest", accent: "#16a34a", hue: 150, dot: "#16a34a" },
+  { name: "Grape", accent: "#8b5cf6", hue: 265, dot: "#8b5cf6" },
+  { name: "Rose", accent: "#e11d48", hue: 350, dot: "#e11d48" },
+  { name: "Mono", accent: "#64748b", hue: 220, dot: "#64748b" },
+];
+---
+
+<!-- Floating launcher -->
+<button
+  id="cs-open"
+  type="button"
+  aria-label="Open theme studio"
+  aria-controls="cs-panel"
+  aria-expanded="false"
+  class="no-theme-transition fixed bottom-6 right-6 z-[60] inline-flex h-12 w-12 items-center justify-center rounded-full bg-accent text-accent-contrast shadow-lg ring-1 ring-black/10 transition hover:scale-105 hover:opacity-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+>
+  <svg class="h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <circle cx="13.5" cy="6.5" r="0.5" fill="currentColor"></circle>
+    <circle cx="17.5" cy="10.5" r="0.5" fill="currentColor"></circle>
+    <circle cx="8.5" cy="7.5" r="0.5" fill="currentColor"></circle>
+    <circle cx="6.5" cy="12.5" r="0.5" fill="currentColor"></circle>
+    <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996C19.65 15.398 22 13.047 22 10.5 22 5.798 17.5 2 12 2z"></path>
+  </svg>
+</button>
+
+<!-- Backdrop -->
+<div
+  id="cs-backdrop"
+  class="fixed inset-0 z-[60] bg-black/40 opacity-0 transition-opacity duration-300 pointer-events-none"
+  aria-hidden="true"
+>
+</div>
+
+<!-- Panel -->
+<aside
+  id="cs-panel"
+  role="dialog"
+  aria-modal="false"
+  aria-label="Theme studio"
+  class="fixed right-0 top-0 z-[61] flex h-dvh w-[22rem] max-w-[90vw] translate-x-full flex-col border-l border-border bg-surface shadow-2xl transition-transform duration-300 ease-out"
+>
+  <header class="flex items-center justify-between border-b border-border px-4 py-3">
+    <div class="flex items-center gap-2">
+      <span class="font-mono text-sm font-semibold text-accent">{"</>"}</span>
+      <h2 class="text-sm font-semibold text-text">Theme Studio</h2>
+    </div>
+    <button
+      id="cs-close"
+      type="button"
+      aria-label="Close theme studio"
+      class="inline-flex h-8 w-8 items-center justify-center rounded-md text-muted transition hover:bg-hover hover:text-text"
+    >
+      <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M18 6 6 18M6 6l12 12"></path>
+      </svg>
+    </button>
+  </header>
+
+  <div class="flex-1 space-y-6 overflow-y-auto px-4 py-5">
+    <!-- Mode hint -->
+    <p class="rounded-lg border border-border bg-bg px-3 py-2 text-xs text-muted">
+      Editing the <strong id="cs-mode" class="font-semibold text-accent">light</strong> palette.
+      Toggle dark mode to edit its colors separately.
+    </p>
+
+    <!-- Presets -->
+    <section>
+      <h3 class="mb-2 text-xs font-semibold uppercase tracking-widest text-muted">Presets</h3>
+      <div class="flex flex-wrap gap-2">
+        {
+          presets.map((p) => (
+            <button
+              type="button"
+              class="cs-preset inline-flex items-center gap-1.5 rounded-full border border-border bg-bg px-3 py-1.5 text-sm text-text transition hover:border-accent"
+              data-reset={p.reset ? "true" : undefined}
+              data-accent={p.accent}
+              data-hue={p.hue?.toString()}
+            >
+              <span class="h-3 w-3 rounded-full" style={`background:${p.dot}`} />
+              {p.name}
+            </button>
+          ))
+        }
+      </div>
+      <button
+        id="cs-random"
+        type="button"
+        class="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-bg px-3 py-2 text-sm font-medium text-text transition hover:border-accent hover:bg-hover"
+      >
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M16 3h5v5M21 3l-7 7M8 21H3v-5M3 21l7-7M21 16v5h-5M14 14l7 7M3 8V3h5M10 10 3 3"></path>
+        </svg>
+        Surprise me
+      </button>
+    </section>
+
+    <!-- Colors -->
+    <section>
+      <h3 class="mb-2 text-xs font-semibold uppercase tracking-widest text-muted">Colors</h3>
+      <div class="space-y-2">
+        {
+          colorFields.map((f) => (
+            <label class="flex items-center justify-between gap-3">
+              <span class="text-sm text-text">{f.label}</span>
+              <span class="flex items-center gap-2">
+                <code id={`cs-hex-${f.key.slice(2)}`} class="font-mono text-xs text-muted">
+                  #000000
+                </code>
+                <input
+                  type="color"
+                  class="cs-color h-7 w-9 cursor-pointer rounded border border-border bg-transparent p-0.5"
+                  data-var={f.key}
+                  aria-label={f.label}
+                />
+              </span>
+            </label>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Typography & radius -->
+    <section class="space-y-4">
+      <h3 class="text-xs font-semibold uppercase tracking-widest text-muted">Type &amp; shape</h3>
+      <label class="flex items-center justify-between gap-3">
+        <span class="text-sm text-text">Font</span>
+        <select
+          id="cs-font"
+          class="rounded-md border border-border bg-bg px-2 py-1 text-sm text-text focus-visible:outline-2 focus-visible:outline-accent"
+        >
+          {fonts.map((f) => <option value={f.value}>{f.label}</option>)}
+        </select>
+      </label>
+      <label class="block">
+        <span class="mb-1 flex items-center justify-between text-sm text-text">
+          Corner radius
+          <code id="cs-radius-val" class="font-mono text-xs text-muted">0.50rem</code>
+        </span>
+        <input
+          id="cs-radius"
+          type="range"
+          min="0"
+          max="24"
+          step="1"
+          class="w-full accent-[var(--accent)]"
+        />
+      </label>
+    </section>
+
+    <!-- Accessibility -->
+    <section>
+      <h3 class="mb-2 text-xs font-semibold uppercase tracking-widest text-muted">Contrast (WCAG)</h3>
+      <div id="cs-wcag" class="space-y-1.5 text-sm"></div>
+    </section>
+
+    <!-- CSS export -->
+    <section>
+      <div class="mb-2 flex items-center justify-between">
+        <h3 class="text-xs font-semibold uppercase tracking-widest text-muted">CSS export</h3>
+        <button
+          id="cs-copy"
+          type="button"
+          class="inline-flex items-center gap-1.5 rounded-md border border-border px-2 py-1 text-xs font-medium text-muted transition hover:border-accent hover:text-accent"
+        >
+          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="9" y="9" width="13" height="13" rx="2"></rect>
+            <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+          </svg>
+          <span id="cs-copy-label">Copy</span>
+        </button>
+      </div>
+      <pre id="cs-css" class="max-h-48 overflow-auto rounded-lg border border-border bg-bg p-3 font-mono text-xs leading-relaxed text-muted"></pre>
+    </section>
+  </div>
+
+  <footer class="flex items-center gap-2 border-t border-border px-4 py-3">
+    <button
+      id="cs-reset"
+      type="button"
+      class="flex-1 rounded-lg border border-border px-3 py-2 text-sm font-medium text-text transition hover:bg-hover"
+    >
+      Reset
+    </button>
+    <button
+      id="cs-share"
+      type="button"
+      class="flex-1 rounded-lg bg-accent px-3 py-2 text-sm font-semibold text-accent-contrast transition hover:opacity-90"
+    >
+      <span id="cs-share-label">Copy link</span>
+    </button>
+  </footer>
+</aside>
+
+<script>
+  // @ts-nocheck
+  // ---- color helpers ------------------------------------------------------
+  const VARS = ["--bg", "--surface", "--text", "--muted", "--border", "--accent"];
+  const MANAGED = [...VARS, "--accent-contrast", "--hover"];
+  const STORAGE_KEY = "theme-studio";
+
+  function clamp(n, a, b) {
+    return Math.min(b, Math.max(a, n));
+  }
+
+  function hexToRgb(hex) {
+    let h = hex.trim().replace("#", "");
+    if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+    const num = parseInt(h, 16);
+    return { r: (num >> 16) & 255, g: (num >> 8) & 255, b: num & 255 };
+  }
+
+  function rgbToHex(r, g, b) {
+    const to = (n) => clamp(Math.round(n), 0, 255).toString(16).padStart(2, "0");
+    return `#${to(r)}${to(g)}${to(b)}`;
+  }
+
+  function hslToHex(h, s, l) {
+    s /= 100;
+    l /= 100;
+    const k = (n) => (n + h / 30) % 12;
+    const a = s * Math.min(l, 1 - l);
+    const f = (n) => l - a * Math.max(-1, Math.min(k(n) - 3, Math.min(9 - k(n), 1)));
+    return rgbToHex(f(0) * 255, f(8) * 255, f(4) * 255);
+  }
+
+  function normalizeHex(value) {
+    const v = (value || "").trim();
+    if (v.startsWith("#")) {
+      let h = v.slice(1);
+      if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+      return "#" + h.slice(0, 6).toLowerCase();
+    }
+    const m = v.match(/rgba?\(([^)]+)\)/);
+    if (m) {
+      const [r, g, b] = m[1].split(",").map((x) => parseFloat(x));
+      return rgbToHex(r, g, b);
+    }
+    return "#000000";
+  }
+
+  function luminance(hex) {
+    const { r, g, b } = hexToRgb(hex);
+    const a = [r, g, b].map((v) => {
+      const x = v / 255;
+      return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+    });
+    return 0.2126 * a[0] + 0.7152 * a[1] + 0.0722 * a[2];
+  }
+
+  function contrast(a, b) {
+    const l1 = luminance(a);
+    const l2 = luminance(b);
+    return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+  }
+
+  function contrastColor(hex) {
+    return luminance(hex) > 0.45 ? "#0b1220" : "#ffffff";
+  }
+
+  // ---- palette generation -------------------------------------------------
+  function isDark() {
+    return document.documentElement.classList.contains("dark");
+  }
+  function mode() {
+    return isDark() ? "dark" : "light";
+  }
+
+  // Build a full palette for a given mode, tinted by the chosen hue.
+  function buildPalette(accent, hue, dark) {
+    const vars = {
+      "--accent": accent,
+      "--accent-contrast": contrastColor(accent),
+      "--bg": hslToHex(hue, 30, dark ? 4 : 99),
+      "--surface": hslToHex(hue, dark ? 28 : 32, dark ? 9 : 96),
+      "--border": hslToHex(hue, dark ? 20 : 25, dark ? 18 : 88),
+      "--muted": hslToHex(hue, dark ? 12 : 14, dark ? 62 : 45),
+      "--text": hslToHex(hue, dark ? 20 : 25, dark ? 84 : 16),
+      "--hover": dark ? "rgba(255,255,255,0.08)" : "rgba(15,23,42,0.05)",
+    };
+    return vars;
+  }
+
+  // ---- state --------------------------------------------------------------
+  let state = { light: {}, dark: {} };
+
+  const root = document.documentElement;
+  const $ = (id) => document.getElementById(id);
+  const curVars = () => state[mode()];
+
+  function readVar(name) {
+    const inline = root.style.getPropertyValue(name);
+    const val = inline || getComputedStyle(root).getPropertyValue(name);
+    return normalizeHex(val);
+  }
+  const cv = (name) => {
+    const v = curVars()[name];
+    return v ? normalizeHex(v) : readVar(name);
+  };
+
+  function applyState(persist = true) {
+    // Clear managed inline props so the inactive mode's CSS can take over,
+    // then apply the current mode's overrides on top.
+    MANAGED.forEach((k) => root.style.removeProperty(k));
+    const vars = curVars();
+    for (const k in vars) root.style.setProperty(k, vars[k]);
+
+    if (state.font) root.style.setProperty("--font-sans", state.font);
+    else root.style.removeProperty("--font-sans");
+    if (state.radius) root.style.setProperty("--radius-base", state.radius);
+    else root.style.removeProperty("--radius-base");
+
+    if (persist) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    syncUI();
+  }
+
+  function syncUI() {
+    const m = $("cs-mode");
+    if (m) m.textContent = mode();
+
+    VARS.forEach((v) => {
+      const stored = curVars()[v];
+      const hex = stored ? normalizeHex(stored) : readVar(v);
+      const input = document.querySelector(`.cs-color[data-var="${v}"]`);
+      if (input) input.value = hex;
+      const label = $(`cs-hex-${v.slice(2)}`);
+      if (label) label.textContent = hex;
+    });
+
+    const fontSel = $("cs-font");
+    const curFont = (state.font || getComputedStyle(root).getPropertyValue("--font-sans")).trim();
+    if (fontSel) {
+      const match = Array.from(fontSel.options).find((o) => o.value.trim() === curFont);
+      if (match) fontSel.value = match.value;
+    }
+
+    const radius = (state.radius || getComputedStyle(root).getPropertyValue("--radius-base")).trim();
+    const rem = parseFloat(radius) || 0;
+    const range = $("cs-radius");
+    if (range) range.value = String(Math.round(rem * 16));
+    const rval = $("cs-radius-val");
+    if (rval) rval.textContent = rem.toFixed(2) + "rem";
+
+    renderWcag();
+    renderCss();
+  }
+
+  function badge(label, ratio, big = false) {
+    const need = big ? 3 : 4.5;
+    const aaa = big ? 4.5 : 7;
+    const pass = ratio >= aaa ? "AAA" : ratio >= need ? "AA" : "Fail";
+    const ok = pass !== "Fail";
+    return `<div class="flex items-center justify-between">
+      <span class="text-muted">${label}</span>
+      <span class="flex items-center gap-2">
+        <code class="font-mono text-xs text-muted">${ratio.toFixed(2)}</code>
+        <span class="rounded px-1.5 py-0.5 text-xs font-semibold ${
+          ok ? "bg-green-500/15 text-green-600 dark:text-green-400" : "bg-red-500/15 text-red-600 dark:text-red-400"
+        }">${pass}</span>
+      </span>
+    </div>`;
+  }
+
+  function renderWcag() {
+    const wrap = $("cs-wcag");
+    if (!wrap) return;
+    wrap.innerHTML =
+      badge("Text / Background", contrast(cv("--text"), cv("--bg")), true) +
+      badge("Muted / Background", contrast(cv("--muted"), cv("--bg"))) +
+      badge("Accent button", contrast(cv("--accent"), cv("--accent-contrast")));
+  }
+
+  function renderCss() {
+    const pre = $("cs-css");
+    if (!pre) return;
+    const accentContrast = curVars()["--accent-contrast"] || contrastColor(cv("--accent"));
+    const radius = (state.radius || getComputedStyle(root).getPropertyValue("--radius-base")).trim();
+    const sel = mode() === "dark" ? ".dark" : ":root";
+    const lines = [
+      `/* ${mode()} mode */`,
+      `${sel} {`,
+      `  --bg: ${cv("--bg")};`,
+      `  --surface: ${cv("--surface")};`,
+      `  --text: ${cv("--text")};`,
+      `  --muted: ${cv("--muted")};`,
+      `  --border: ${cv("--border")};`,
+      `  --accent: ${cv("--accent")};`,
+      `  --accent-contrast: ${accentContrast};`,
+      `  --radius-base: ${radius || "0.5rem"};`,
+      "}",
+    ];
+    pre.textContent = lines.join("\n");
+  }
+
+  // ---- init ---------------------------------------------------------------
+  function loadInitial() {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && (parsed.light || parsed.dark)) {
+          state = {
+            light: parsed.light || {},
+            dark: parsed.dark || {},
+            font: parsed.font,
+            radius: parsed.radius,
+          };
+        } else if (parsed) {
+          // legacy flat format: keep only font/radius, drop ambiguous colors
+          state = { light: {}, dark: {}, font: parsed.font, radius: parsed.radius };
+        }
+      }
+    } catch {
+      state = { light: {}, dark: {} };
+    }
+    syncUI();
+  }
+
+  // ---- wiring -------------------------------------------------------------
+  const panel = $("cs-panel");
+  const backdrop = $("cs-backdrop");
+  const openBtn = $("cs-open");
+
+  function openPanel() {
+    panel?.classList.remove("translate-x-full");
+    backdrop?.classList.remove("opacity-0", "pointer-events-none");
+    openBtn?.setAttribute("aria-expanded", "true");
+  }
+  function closePanel() {
+    panel?.classList.add("translate-x-full");
+    backdrop?.classList.add("opacity-0", "pointer-events-none");
+    openBtn?.setAttribute("aria-expanded", "false");
+  }
+
+  openBtn?.addEventListener("click", openPanel);
+  $("cs-close")?.addEventListener("click", closePanel);
+  backdrop?.addEventListener("click", closePanel);
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closePanel();
+  });
+
+  // color pickers - edits apply to the current mode (accent shared across both)
+  document.querySelectorAll(".cs-color").forEach((input) => {
+    input.addEventListener("input", () => {
+      const name = input.dataset.var;
+      const val = input.value;
+      if (name === "--accent") {
+        const cc = contrastColor(val);
+        state.light["--accent"] = val;
+        state.dark["--accent"] = val;
+        state.light["--accent-contrast"] = cc;
+        state.dark["--accent-contrast"] = cc;
+      } else {
+        curVars()[name] = val;
+        if (name === "--text") {
+          const { r, g, b } = hexToRgb(val);
+          curVars()["--hover"] = `rgba(${r},${g},${b},0.08)`;
+        }
+      }
+      applyState();
+    });
+  });
+
+  // presets - generate BOTH mode palettes from the same seed
+  document.querySelectorAll(".cs-preset").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      if (btn.dataset.reset) {
+        resetTheme();
+        return;
+      }
+      const accent = btn.dataset.accent;
+      const hue = parseFloat(btn.dataset.hue);
+      state.light = buildPalette(accent, hue, false);
+      state.dark = buildPalette(accent, hue, true);
+      applyState();
+    });
+  });
+
+  // randomize
+  $("cs-random")?.addEventListener("click", () => {
+    const hue = Math.floor(Math.random() * 360);
+    const accent = hslToHex(hue, 70, isDark() ? 60 : 50);
+    state.light = buildPalette(accent, hue, false);
+    state.dark = buildPalette(accent, hue, true);
+    applyState();
+  });
+
+  // font + radius
+  $("cs-font")?.addEventListener("change", (e) => {
+    state.font = e.target.value;
+    applyState();
+  });
+  $("cs-radius")?.addEventListener("input", (e) => {
+    const px = parseFloat(e.target.value);
+    state.radius = (px / 16).toFixed(3) + "rem";
+    root.style.setProperty("--radius-base", state.radius);
+    const rval = $("cs-radius-val");
+    if (rval) rval.textContent = (px / 16).toFixed(2) + "rem";
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    renderCss();
+  });
+
+  // copy CSS
+  $("cs-copy")?.addEventListener("click", async () => {
+    const css = $("cs-css")?.textContent || "";
+    try {
+      await navigator.clipboard.writeText(css);
+      flash("cs-copy-label", "Copied!", "Copy");
+    } catch {
+      /* ignore */
+    }
+  });
+
+  // reset
+  function resetTheme() {
+    state = { light: {}, dark: {} };
+    [...MANAGED, "--font-sans", "--radius-base"].forEach((v) => root.style.removeProperty(v));
+    localStorage.removeItem(STORAGE_KEY);
+    if (location.hash.includes("theme=")) {
+      history.replaceState(null, "", location.pathname + location.search);
+    }
+    syncUI();
+  }
+  $("cs-reset")?.addEventListener("click", resetTheme);
+
+  // share
+  $("cs-share")?.addEventListener("click", async () => {
+    const encoded = btoa(JSON.stringify(state));
+    const url = `${location.origin}${location.pathname}#theme=${encodeURIComponent(encoded)}`;
+    history.replaceState(null, "", `#theme=${encodeURIComponent(encoded)}`);
+    try {
+      await navigator.clipboard.writeText(url);
+      flash("cs-share-label", "Link copied!", "Copy link");
+    } catch {
+      /* ignore */
+    }
+  });
+
+  function flash(id, msg, original) {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = msg;
+    setTimeout(() => {
+      el.textContent = original;
+    }, 1500);
+  }
+
+  // Re-apply the right palette whenever dark mode toggles.
+  new MutationObserver(() => applyState(false)).observe(root, {
+    attributes: true,
+    attributeFilter: ["class"],
+  });
+
+  loadInitial();
+</script>

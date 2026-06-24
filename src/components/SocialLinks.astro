@@ -1,0 +1,51 @@
+---
+import { socials } from "../data/portfolio";
+
+const { class: className = "" } = Astro.props;
+---
+
+<ul class={`flex items-center gap-2 ${className}`}>
+  {
+    socials.map((s) => (
+      <li>
+        <a
+          href={s.href}
+          target={s.href.startsWith("mailto:") ? undefined : "_blank"}
+          rel="noopener noreferrer"
+          aria-label={s.label}
+          title={s.label}
+          class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted transition hover:-translate-y-0.5 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+        >
+          {s.label === "GitHub" && (
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z"
+              />
+            </svg>
+          )}
+          {s.label === "LinkedIn" && (
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M4.98 3.5C4.98 4.881 3.87 6 2.5 6S.02 4.881.02 3.5C.02 2.12 1.13 1 2.5 1s2.48 1.12 2.48 2.5zM.25 8h4.5v15.5H.25V8zm7.5 0h4.31v2.12h.06c.6-1.14 2.07-2.34 4.26-2.34 4.56 0 5.4 3 5.4 6.9v8.82h-4.5v-7.82c0-1.86-.03-4.26-2.6-4.26-2.6 0-3 2.03-3 4.13v7.95h-4.5V8z" />
+            </svg>
+          )}
+          {s.label === "X" && (
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+          )}
+          {s.label === "Email" && (
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="m22 7-10 6L2 7" />
+            </svg>
+          )}
+          {!["GitHub", "LinkedIn", "X", "Email"].includes(s.label) && (
+            <span class="text-xs font-semibold">{s.label.slice(0, 2)}</span>
+          )}
+        </a>
+      </li>
+    ))
+  }
+</ul>

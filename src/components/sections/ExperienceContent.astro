@@ -1,0 +1,13 @@
+---
+import { experience } from "../../data/portfolio";
+import ExperienceTimeline from "../vue/ExperienceTimeline.vue";
+---
+
+<div class="max-w-2xl">
+  <h2 class="text-sm font-semibold uppercase tracking-widest text-accent">
+    Experience
+  </h2>
+  <p class="mt-2 text-3xl font-bold text-text">Where I've worked</p>
+</div>
+
+<ExperienceTimeline client:visible experience={experience} />

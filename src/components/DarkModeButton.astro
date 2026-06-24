@@ -1,0 +1,70 @@
+---
+// Floating dark-mode toggle. ON = dark mode, OFF = normal (light) mode.
+// Toggles `.dark` on <html> and persists to localStorage.
+// Stacks above the devMode button in the bottom-right corner.
+---
+
+<button
+    id="dark-mode-btn"
+    type="button"
+    role="switch"
+    aria-checked="false"
+    aria-label="Toggle dark mode"
+    class="group no-theme-transition fixed bottom-[9.5rem] right-6 z-[60] inline-flex h-12 w-12 items-center justify-center rounded-full border border-border bg-surface text-muted shadow-lg ring-1 ring-black/10 transition hover:scale-105 hover:text-text focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent dark:border-transparent dark:bg-gradient-to-br dark:from-emerald-400 dark:to-emerald-600 dark:text-white"
+>
+    <!-- Hover/focus label -->
+    <span
+        class="pointer-events-none absolute right-14 whitespace-nowrap rounded-md bg-text px-2 py-1 text-xs font-medium text-bg opacity-0 shadow-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+    >
+        <span class="dark:hidden">darkMode OFF</span>
+        <span class="hidden dark:inline">darkMode ON</span>
+    </span>
+
+    <!-- Sun (light / OFF) -->
+    <svg
+        class="h-5 w-5 dark:hidden"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+    >
+        <circle cx="12" cy="12" r="4"></circle>
+        <path
+            d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"
+        ></path>
+    </svg>
+
+    <!-- Moon (dark / ON) -->
+    <svg
+        class="hidden h-5 w-5 dark:block"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+    >
+        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+    </svg>
+</button>
+
+<script is:inline>
+    (function () {
+        const btn = document.getElementById("dark-mode-btn");
+        if (!btn) return;
+        const sync = () => {
+            const isDark = document.documentElement.classList.contains("dark");
+            btn.setAttribute("aria-checked", isDark ? "true" : "false");
+        };
+        sync();
+        btn.addEventListener("click", () => {
+            const isDark = document.documentElement.classList.toggle("dark");
+            localStorage.setItem("theme", isDark ? "dark" : "light");
+            sync();
+        });
+    })();
+</script>

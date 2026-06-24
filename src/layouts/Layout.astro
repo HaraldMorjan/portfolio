@@ -1,0 +1,118 @@
+---
+import "../styles/global.css";
+import { profile, socials } from "../data/portfolio";
+
+const {
+  title = `${profile.name} - ${profile.role}`,
+  description = profile.tagline,
+} = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const ogImage = new URL("/og.png", Astro.site).href;
+const siteName = `${profile.name} — Portfolio`;
+
+const sameAs = socials
+  .map((s) => s.href)
+  .filter((href) => href.startsWith("http"));
+const email = (
+  socials.find((s) => s.href.startsWith("mailto:"))?.href || ""
+).replace("mailto:", "");
+
+const personLd = {
+  "@context": "https://schema.org",
+  "@type": "Person",
+  name: profile.name,
+  jobTitle: profile.role,
+  description: profile.bio,
+  url: new URL("/", Astro.site).href,
+  ...(email ? { email } : {}),
+  ...(sameAs.length ? { sameAs } : {}),
+  address: {
+    "@type": "PostalAddress",
+    addressLocality: profile.location,
+  },
+};
+---
+
+<!doctype html>
+<html lang="en" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={siteName} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={ogImage} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+
+    <!-- Structured data -->
+    <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- No-flash theme: runs before paint to set the right class on <html>
+         and apply any Theme Studio overrides (from URL hash or localStorage). -->
+    <script is:inline>
+      (function () {
+        const root = document.documentElement;
+        const stored = localStorage.getItem("theme");
+        const prefersDark = window.matchMedia(
+          "(prefers-color-scheme: dark)",
+        ).matches;
+        if (stored === "dark" || (!stored && prefersDark)) {
+          root.classList.add("dark");
+        } else {
+          root.classList.remove("dark");
+        }
+
+        try {
+          let raw = null;
+          const hash = location.hash.match(/theme=([^&]+)/);
+          if (hash) {
+            raw = atob(decodeURIComponent(hash[1]));
+            localStorage.setItem("theme-studio", raw);
+          } else {
+            raw = localStorage.getItem("theme-studio");
+          }
+          if (raw) {
+            const s = JSON.parse(raw);
+            const mode = root.classList.contains("dark") ? "dark" : "light";
+            const vars = (s && (s[mode] || s.vars)) || {};
+            for (const k in vars) root.style.setProperty(k, vars[k]);
+            if (s.font) root.style.setProperty("--font-sans", s.font);
+            if (s.radius) root.style.setProperty("--radius-base", s.radius);
+          }
+        } catch (e) {
+          /* ignore malformed theme data */
+        }
+      })();
+    </script>
+  </head>
+  <body class="font-sans">
+    <a
+      href="#main"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-accent-contrast focus:shadow-lg focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+      >Skip to content</a
+    >
+    <slot />
+  </body>
+</html>

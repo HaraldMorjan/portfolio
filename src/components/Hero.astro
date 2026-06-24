@@ -1,0 +1,185 @@
+---
+import { profile, techStack, experience } from "../data/portfolio";
+import SocialLinks from "./SocialLinks.astro";
+
+const initials = profile.name
+  .split(" ")
+  .map((p) => p[0])
+  .join("")
+  .slice(0, 2)
+  .toUpperCase();
+
+// Credibility stats (derived from the data so they stay accurate).
+const years = new Date().getFullYear() - 2014;
+const techCount = techStack.reduce((n, c) => n + c.items.length, 0);
+const stats = [
+  { value: `${years}+`, label: "Years experience" },
+  { value: `${experience.length}`, label: "Roles & promotions" },
+  { value: `${techCount}+`, label: "Technologies" },
+];
+---
+
+<section id="top" class="relative overflow-hidden border-b border-border">
+  <!-- Layered background (all follow the live accent color) -->
+  <div
+    class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(45rem_35rem_at_70%_-10%,color-mix(in_srgb,var(--accent)_22%,transparent),transparent)]"
+  >
+  </div>
+  <div
+    class="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(circle_at_1px_1px,var(--border)_1px,transparent_0)] opacity-50 [background-size:24px_24px] [mask-image:radial-gradient(ellipse_at_center,black,transparent_72%)]"
+  >
+  </div>
+  <div
+    class="pointer-events-none absolute -right-20 top-10 -z-10 h-72 w-72 rounded-full bg-accent opacity-15 blur-3xl"
+  >
+  </div>
+
+  <div class="mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-28">
+    <div class="flex flex-col items-start gap-10 md:flex-row md:items-center md:gap-14">
+      <!-- Avatar -->
+      <div class="flex animate-fade-up flex-col items-start gap-4 md:items-center">
+        <div class="group relative">
+          <div
+            class="absolute -inset-1.5 -z-10 rounded-[1.75rem] bg-gradient-to-br from-accent to-transparent opacity-70 blur-md transition group-hover:opacity-100"
+          >
+          </div>
+          {
+            profile.avatar ? (
+              <img
+                src={profile.avatar}
+                alt={profile.name}
+                class="h-28 w-28 rounded-3xl object-cover shadow-xl ring-1 ring-white/10"
+              />
+            ) : (
+              <div class="flex h-28 w-28 items-center justify-center rounded-3xl bg-accent text-4xl font-bold text-accent-contrast shadow-xl ring-1 ring-white/10">
+                {initials}
+              </div>
+            )
+          }
+        </div>
+        <p
+          class="inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-3 py-1 text-sm font-medium text-muted backdrop-blur"
+        >
+          <span class="relative flex h-2 w-2">
+            <span
+              class="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-75"
+            ></span>
+            <span class="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
+          </span>
+          Available for work
+        </p>
+      </div>
+
+      <!-- Intro -->
+      <div class="min-w-0">
+        <h1
+          class="hero-name animate-fade-up text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
+        >
+          {profile.name}
+        </h1>
+
+        <p
+          class="mt-4 flex animate-fade-up flex-wrap items-center gap-x-2 font-mono text-lg font-semibold text-text sm:text-xl"
+          style="animation-delay:60ms"
+        >
+          <span class="text-accent" aria-hidden="true">&gt;</span>
+          {profile.role}
+          <span
+            class="cursor-blink inline-block h-5 w-[3px] translate-y-0.5 rounded-full bg-accent"
+            aria-hidden="true"></span>
+        </p>
+
+        {
+          profile.badges && profile.badges.length > 0 && (
+            <ul
+              class="mt-5 flex animate-fade-up flex-wrap gap-2"
+              style="animation-delay:120ms"
+            >
+              {profile.badges.map((badge) => (
+                <li class="inline-flex items-center gap-1.5 rounded-full border border-border bg-surface/60 px-3 py-1 text-xs font-medium text-muted backdrop-blur transition hover:border-accent hover:text-text">
+                  <span class="h-1.5 w-1.5 rounded-full bg-accent" aria-hidden="true" />
+                  {badge}
+                </li>
+              ))}
+            </ul>
+          )
+        }
+
+        <p
+          class="mt-6 max-w-xl animate-fade-up text-lg leading-relaxed text-muted"
+          style="animation-delay:180ms"
+        >
+          {profile.tagline}
+        </p>
+
+        <!-- Stats -->
+        <dl
+          class="mt-8 flex animate-fade-up flex-wrap gap-x-10 gap-y-4"
+          style="animation-delay:240ms"
+        >
+          {
+            stats.map((s) => (
+              <div>
+                <dt class="text-3xl font-extrabold tracking-tight text-text">
+                  {s.value}
+                </dt>
+                <dd class="mt-0.5 text-xs font-medium uppercase tracking-widest text-muted">
+                  {s.label}
+                </dd>
+              </div>
+            ))
+          }
+        </dl>
+
+        <div
+          class="mt-9 flex animate-fade-up flex-wrap items-center gap-3"
+          style="animation-delay:300ms"
+        >
+          <a
+            href="#projects"
+            class="group inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-accent-contrast shadow-lg shadow-accent/25 transition hover:-translate-y-0.5 hover:shadow-accent/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            View my work
+            <svg class="h-4 w-4 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="m12 5 7 7-7 7" />
+            </svg>
+          </a>
+          <a
+            href="#contact"
+            class="inline-flex items-center gap-2 rounded-xl border border-border bg-surface/40 px-6 py-3 text-sm font-semibold text-text backdrop-blur transition hover:-translate-y-0.5 hover:border-accent hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          >
+            Get in touch
+          </a>
+          {
+            profile.resumeUrl && (
+              <a
+                href={profile.resumeUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex items-center gap-2 px-2 py-3 text-sm font-semibold text-muted underline-offset-4 transition hover:text-accent hover:underline"
+              >
+                Resume
+              </a>
+            )
+          }
+        </div>
+
+        <SocialLinks class="mt-8" />
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero-name {
+    background: linear-gradient(
+      120deg,
+      var(--text) 38%,
+      color-mix(in srgb, var(--accent) 85%, var(--text))
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+</style>

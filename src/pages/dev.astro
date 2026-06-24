@@ -1,0 +1,28 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Footer from "../components/Footer.astro";
+import ThemeStudio from "../components/ThemeStudio.astro";
+import DevModeButton from "../components/DevModeButton.astro";
+import DarkModeButton from "../components/DarkModeButton.astro";
+import CodeEditor from "../components/dev/CodeEditor.astro";
+import { portfolio, profile } from "../data/portfolio";
+import { aboutTs, readmeMd } from "../data/devCode";
+
+const files = [
+  { id: "about-ts", filename: "about.ts", lang: "ts", view: "code", code: aboutTs(portfolio) },
+  { id: "stack-md", filename: "stack.md", lang: "md", view: "stack" },
+  { id: "experience-md", filename: "experience.md", lang: "md", view: "experience" },
+  { id: "projects-md", filename: "projects.md", lang: "md", view: "projects" },
+  { id: "readme-md", filename: "README.md", lang: "md", view: "markdown", code: readmeMd(portfolio) },
+];
+---
+
+<Layout title={`${profile.name} - DevView`} description="A technical, code-editor view of the portfolio.">
+  <main id="main" class="mx-auto max-w-[1800px] px-4 py-8 sm:px-6 sm:py-10">
+    <CodeEditor files={files} />
+  </main>
+  <Footer />
+  <DarkModeButton />
+  <DevModeButton />
+  <ThemeStudio />
+</Layout>

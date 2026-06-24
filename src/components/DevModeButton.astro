@@ -1,0 +1,44 @@
+---
+// Floating devMode toggle. ON (DevView) = green, OFF (standard) = default.
+// Navigates between routes and reflects the current view as its on/off state.
+// Stacks just above the Theme Studio launcher in the bottom-right corner.
+const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isDev = pathname.startsWith("/dev");
+const target = isDev ? "/" : "/dev";
+---
+
+<a
+    href={target}
+    aria-label={isDev ? "Switch to standard view" : "Switch to developer view"}
+    title={isDev
+        ? "devMode: ON - switch to standard view"
+        : "devMode: OFF - switch to DevView"}
+    class:list={[
+        "group no-theme-transition fixed bottom-[5.5rem] right-6 z-[60] inline-flex h-12 w-12 items-center justify-center rounded-full shadow-lg ring-1 ring-black/10 transition hover:scale-105 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent",
+        isDev
+            ? "bg-gradient-to-br from-emerald-400 to-emerald-600 text-white"
+            : "border border-border bg-surface text-muted hover:text-text",
+    ]}
+>
+    <!-- Hover/focus label -->
+    <span
+        class="pointer-events-none absolute right-14 whitespace-nowrap rounded-md bg-text px-2 py-1 text-xs font-medium text-bg opacity-0 shadow-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+    >
+        devMode {isDev ? "ON" : "OFF"}
+    </span>
+
+    <!-- Code glyph -->
+    <svg
+        class="h-5 w-5"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.5"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+    >
+        <path d="m9 8-4 4 4 4"></path>
+        <path d="m15 8 4 4-4 4"></path>
+    </svg>
+</a>
