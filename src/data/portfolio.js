@@ -1,18 +1,36 @@
 // ---------------------------------------------------------------------------
 // Single source of truth for all portfolio content.
 //
-// The actual content lives in ./portfolio.json so it can be edited without
-// touching code. This module just imports that JSON and re-exports it, so
-// every section (and both the standard view and the DevView) renders from the
-// exact same data.
+// The actual content lives in ./portfolio.json, now keyed by locale:
+//   { en: {...}, es: {...}, socials: [...] }
+//
+// `socials` is language-neutral and shared. Use getPortfolio(lang) to pull a
+// fully-resolved content object for a given locale. The named exports below
+// default to English so the DevView and any non-localized code keep working.
 // ---------------------------------------------------------------------------
 
 import data from "./portfolio.json";
+import { DEFAULT_LANG } from "./i18n.js";
 
-export const portfolio = data;
+export const portfolioData = data;
 
-export const profile = portfolio.profile;
-export const socials = portfolio.socials;
-export const techStack = portfolio.techStack;
-export const projects = portfolio.projects;
-export const experience = portfolio.experience;
+export function getPortfolio(lang = DEFAULT_LANG) {
+  const locale = data[lang] || data[DEFAULT_LANG];
+  return {
+    profile: locale.profile,
+    socials: data.socials,
+    techStack: locale.techStack,
+    projects: locale.projects,
+    experience: locale.experience,
+  };
+}
+
+// Backward-compatible English exports.
+const en = getPortfolio(DEFAULT_LANG);
+
+export const portfolio = en;
+export const profile = en.profile;
+export const socials = en.socials;
+export const techStack = en.techStack;
+export const projects = en.projects;
+export const experience = en.experience;

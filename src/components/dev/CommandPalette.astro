@@ -1,0 +1,387 @@
+---
+// Command palette (⌘/Ctrl + K) for the DevView. Fuzzy-search to jump between
+// editor tabs, run terminal commands, toggle theme/language, and open links.
+// All actions are dispatched as DOM events / button clicks so the palette stays
+// decoupled from the components it drives.
+import { getPortfolio } from "../../data/portfolio";
+import { getUi, localizedPath, DEFAULT_LANG } from "../../data/i18n.js";
+
+const { files = [], lang = DEFAULT_LANG } = Astro.props;
+const { profile, socials } = getPortfolio(lang);
+const t = getUi(lang).dev;
+const P = t.palette;
+
+const standardHref = localizedPath(lang, "/");
+const resumeUrl = profile.resumeUrl || "";
+const calendarUrl = profile.calendarUrl || "";
+
+const data = {
+  files: files.map((f) => ({ id: f.id, filename: f.filename })),
+  socials,
+  standardHref,
+  resumeUrl,
+  calendarUrl,
+  strings: P,
+};
+---
+
+<div
+  id="cmdk-root"
+  data-open="false"
+  class="fixed inset-0 z-[80] hidden items-start justify-center px-4 pt-[12vh] sm:pt-[15vh]"
+  aria-hidden="true"
+>
+  <!-- Backdrop -->
+  <div id="cmdk-backdrop" class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+  <!-- Panel -->
+  <div
+    role="dialog"
+    aria-modal="true"
+    aria-label={P.open}
+    class="cmdk-panel relative w-full max-w-xl overflow-hidden rounded-xl border border-border bg-surface shadow-2xl ring-1 ring-black/10"
+  >
+    <!-- Search row -->
+    <div class="flex items-center gap-3 border-b border-border px-4">
+      <svg class="h-4 w-4 shrink-0 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="11" cy="11" r="8"></circle>
+        <path d="m21 21-4.3-4.3"></path>
+      </svg>
+      <input
+        id="cmdk-input"
+        type="text"
+        autocomplete="off"
+        autocapitalize="off"
+        autocorrect="off"
+        spellcheck="false"
+        placeholder={P.placeholder}
+        aria-label={P.open}
+        aria-controls="cmdk-list"
+        class="w-full bg-transparent py-3.5 font-mono text-sm text-text outline-none placeholder:text-muted"
+      />
+      <kbd class="shrink-0 rounded border border-border bg-bg px-1.5 py-0.5 font-mono text-[0.65rem] text-muted">esc</kbd>
+    </div>
+
+    <!-- Results -->
+    <ul id="cmdk-list" role="listbox" class="max-h-[min(22rem,55vh)] overflow-y-auto p-2 [scrollbar-width:thin]"></ul>
+    <p id="cmdk-empty" class="hidden px-4 py-8 text-center font-mono text-sm text-muted">{P.empty}</p>
+
+    <!-- Footer hints -->
+    <div class="flex items-center gap-4 border-t border-border bg-bg/40 px-4 py-2 font-mono text-[0.65rem] text-muted">
+      <span class="flex items-center gap-1.5">
+        <kbd class="rounded border border-border bg-surface px-1 py-0.5">↑</kbd>
+        <kbd class="rounded border border-border bg-surface px-1 py-0.5">↓</kbd>
+        {P.navHint}
+      </span>
+      <span class="flex items-center gap-1.5">
+        <kbd class="rounded border border-border bg-surface px-1 py-0.5">↵</kbd>
+        {P.selectHint}
+      </span>
+      <span class="ml-auto flex items-center gap-1.5">
+        <kbd class="rounded border border-border bg-surface px-1 py-0.5">esc</kbd>
+        {P.closeHint}
+      </span>
+    </div>
+  </div>
+</div>
+
+<script type="application/json" id="cmdk-data" is:inline set:html={JSON.stringify(data)} />
+
+<style>
+  #cmdk-root[data-open="true"] {
+    display: flex;
+  }
+  .cmdk-panel {
+    animation: cmdk-in 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  @keyframes cmdk-in {
+    from {
+      opacity: 0;
+      transform: translateY(-8px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cmdk-panel {
+      animation: none;
+    }
+  }
+</style>
+
+<script>
+  // @ts-nocheck
+  (function () {
+    const root = document.getElementById("cmdk-root");
+    const data = JSON.parse(document.getElementById("cmdk-data")?.textContent || "{}");
+    if (!root) return;
+
+    const input = document.getElementById("cmdk-input");
+    const list = document.getElementById("cmdk-list");
+    const emptyEl = document.getElementById("cmdk-empty");
+    const backdrop = document.getElementById("cmdk-backdrop");
+    const S = data.strings || {};
+
+    const ICONS = {
+      file: '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+      run: '<path d="m4 17 6-6-6-6"/><path d="M12 19h8"/>',
+      contact: '<rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/>',
+      theme: '<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M6.3 17.7l-1.4 1.4M19.1 4.9l-1.4 1.4"/>',
+      lang: '<circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 4 10 15 15 0 0 1-4 10 15 15 0 0 1-4-10 15 15 0 0 1 4-10z"/>',
+      palette: '<circle cx="13.5" cy="6.5" r=".5"/><circle cx="17.5" cy="10.5" r=".5"/><circle cx="8.5" cy="7.5" r=".5"/><circle cx="6.5" cy="12.5" r=".5"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.9 0 1.6-.7 1.6-1.7 0-.4-.2-.8-.4-1.1-.3-.3-.4-.7-.4-1.1a1.6 1.6 0 0 1 1.6-1.7h2C19.6 15.4 22 13 22 10.5 22 5.8 17.5 2 12 2z"/>',
+      resume: '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><path d="M7 10l5 5 5-5"/><path d="M12 15V3"/>',
+      book: '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+      standard: '<rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/>',
+      link: '<path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1"/><path d="M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/>',
+      github: '<path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.9a3.4 3.4 0 0 0-1-2.6c3-.3 6-1.5 6-6.5a5 5 0 0 0-1.4-3.5 4.7 4.7 0 0 0-.1-3.5s-1.1-.3-3.5 1.3a12 12 0 0 0-6 0C6.6 1.7 5.5 2 5.5 2a4.7 4.7 0 0 0-.1 3.5A5 5 0 0 0 4 9c0 5 3 6.2 6 6.5a3.4 3.4 0 0 0-1 2.6V22"/>',
+      term: '<path d="M4 17l6-6-6-6"/><path d="M12 19h8"/>',
+    };
+
+    const svg = (name) =>
+      `<svg class="h-4 w-4 shrink-0 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ICONS.run}</svg>`;
+
+    const fireTab = (id) => window.dispatchEvent(new CustomEvent("devtab:open", { detail: { id } }));
+    const fireRun = (cmd) => window.dispatchEvent(new CustomEvent("term:run", { detail: { cmd } }));
+    const clickEl = (sel) => document.querySelector(sel)?.click();
+
+    // ---- build the action catalogue -------------------------------------
+    const actions = [];
+
+    (data.files || []).forEach((f) => {
+      actions.push({
+        group: S.groupNav,
+        icon: "file",
+        label: f.filename,
+        keywords: ["go", "open", "tab", f.id],
+        run: () => fireTab(f.id),
+      });
+    });
+
+    const runCmds = [
+      { label: S.githubStats, icon: "github", cmd: "github", kw: ["stats", "repos", "stars"] },
+      { label: S.neofetch, icon: "term", cmd: "neofetch", kw: ["system", "info", "ascii"] },
+      { label: "projects", icon: "run", cmd: "projects", kw: ["work"] },
+      { label: "skills", icon: "run", cmd: "skills", kw: ["stack", "tech"] },
+      { label: "whoami", icon: "run", cmd: "whoami", kw: ["name", "role"] },
+      { label: "help", icon: "run", cmd: "help", kw: ["commands"] },
+    ];
+    runCmds.forEach((r) =>
+      actions.push({
+        group: S.groupRun,
+        icon: r.icon,
+        label: r.label,
+        keywords: ["run", r.cmd, ...(r.kw || [])],
+        run: () => fireRun(r.cmd),
+      }),
+    );
+
+    actions.push({
+      group: S.groupActions,
+      icon: "contact",
+      label: S.contact,
+      keywords: ["email", "message", "hire", "hello"],
+      run: () => window.dispatchEvent(new CustomEvent("contact:open")),
+    });
+    actions.push({
+      group: S.groupActions,
+      icon: "theme",
+      label: S.toggleTheme,
+      keywords: ["dark", "light", "mode"],
+      run: () => clickEl("#dark-mode-btn"),
+    });
+    actions.push({
+      group: S.groupActions,
+      icon: "palette",
+      label: S.themeStudio,
+      keywords: ["color", "design", "tokens"],
+      run: () => clickEl("#cs-open"),
+    });
+    actions.push({
+      group: S.groupActions,
+      icon: "lang",
+      label: S.switchLang,
+      keywords: ["language", "idioma", "es", "en"],
+      run: () => clickEl("[data-lang-choice]"),
+    });
+    actions.push({
+      group: S.groupActions,
+      icon: "standard",
+      label: S.standard,
+      keywords: ["regular", "normal", "view"],
+      run: () => (window.location.href = data.standardHref),
+    });
+    if (data.calendarUrl) {
+      actions.push({
+        group: S.groupActions,
+        icon: "book",
+        label: S.book,
+        keywords: ["call", "meeting", "schedule", "calendar"],
+        run: () => window.open(data.calendarUrl, "_blank", "noopener"),
+      });
+    }
+    if (data.resumeUrl) {
+      actions.push({
+        group: S.groupActions,
+        icon: "resume",
+        label: S.resume,
+        keywords: ["cv", "download"],
+        run: () => window.open(data.resumeUrl, "_blank", "noopener"),
+      });
+    }
+
+    (data.socials || []).forEach((s) => {
+      if (/^mailto:/i.test(s.href)) return; // email handled by Contact action
+      actions.push({
+        group: S.groupLinks,
+        icon: "link",
+        label: s.label,
+        keywords: ["link", "open", s.href],
+        run: () => window.open(s.href, "_blank", "noopener"),
+      });
+    });
+
+    // ---- fuzzy filtering --------------------------------------------------
+    function score(q, text) {
+      q = q.toLowerCase();
+      text = text.toLowerCase();
+      if (!q) return 0;
+      let qi = 0;
+      let sc = 0;
+      let prev = -2;
+      for (let i = 0; i < text.length && qi < q.length; i++) {
+        if (text[i] === q[qi]) {
+          sc += i === prev + 1 ? 3 : 1;
+          prev = i;
+          qi++;
+        }
+      }
+      if (qi < q.length) return -1;
+      return sc + (text.startsWith(q) ? 6 : 0);
+    }
+
+    function rank(query) {
+      const q = query.trim();
+      return actions
+        .map((a) => {
+          if (!q) return { a, s: 0 };
+          const hay = [a.label, ...(a.keywords || [])];
+          const best = Math.max(...hay.map((h) => score(q, h)));
+          return { a, s: best };
+        })
+        .filter((r) => r.s >= 0)
+        .sort((x, y) => y.s - x.s);
+    }
+
+    // ---- rendering --------------------------------------------------------
+    let flat = [];
+    let active = 0;
+
+    function render(query) {
+      const ranked = rank(query);
+      flat = ranked.map((r) => r.a);
+      list.innerHTML = "";
+      active = 0;
+
+      if (!flat.length) {
+        emptyEl.classList.remove("hidden");
+        return;
+      }
+      emptyEl.classList.add("hidden");
+
+      let lastGroup = null;
+      flat.forEach((a, i) => {
+        if (a.group !== lastGroup) {
+          lastGroup = a.group;
+          const h = document.createElement("li");
+          h.setAttribute("role", "presentation");
+          h.className =
+            "px-2 pb-1 pt-3 font-mono text-[0.65rem] font-semibold uppercase tracking-widest text-muted first:pt-1";
+          h.textContent = a.group;
+          list.appendChild(h);
+        }
+        const li = document.createElement("li");
+        li.setAttribute("role", "option");
+        li.dataset.idx = String(i);
+        li.className =
+          "cmdk-item flex cursor-pointer items-center gap-3 rounded-lg px-2.5 py-2 font-mono text-sm text-text data-[active=true]:bg-accent-strong data-[active=true]:text-accent-contrast";
+        li.innerHTML = `${svg(a.icon)}<span class="truncate">${a.label}</span>`;
+        li.addEventListener("mousemove", () => setActive(i));
+        li.addEventListener("click", () => choose(i));
+        list.appendChild(li);
+      });
+      setActive(0);
+    }
+
+    function setActive(i) {
+      active = i;
+      list.querySelectorAll(".cmdk-item").forEach((el) => {
+        const on = Number(el.dataset.idx) === i;
+        el.dataset.active = on ? "true" : "false";
+        if (on) el.scrollIntoView({ block: "nearest" });
+      });
+    }
+
+    function move(delta) {
+      if (!flat.length) return;
+      let i = active + delta;
+      if (i < 0) i = flat.length - 1;
+      if (i >= flat.length) i = 0;
+      setActive(i);
+    }
+
+    function choose(i) {
+      const a = flat[i];
+      if (!a) return;
+      close();
+      // Defer so the palette is gone before terminal/contact UI takes focus.
+      setTimeout(() => a.run(), 10);
+    }
+
+    // ---- open / close -----------------------------------------------------
+    let lastFocus = null;
+    function open() {
+      if (root.dataset.open === "true") return;
+      lastFocus = document.activeElement;
+      root.dataset.open = "true";
+      root.setAttribute("aria-hidden", "false");
+      input.value = "";
+      render("");
+      requestAnimationFrame(() => input.focus());
+    }
+    function close() {
+      if (root.dataset.open !== "true") return;
+      root.dataset.open = "false";
+      root.setAttribute("aria-hidden", "true");
+      if (lastFocus && typeof lastFocus.focus === "function") lastFocus.focus();
+    }
+
+    input.addEventListener("input", () => render(input.value));
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        move(1);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        move(-1);
+      } else if (e.key === "Enter") {
+        e.preventDefault();
+        choose(active);
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        close();
+      }
+    });
+    backdrop?.addEventListener("click", close);
+
+    // Global shortcut: Cmd/Ctrl + K toggles the palette.
+    window.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        root.dataset.open === "true" ? close() : open();
+      }
+    });
+    window.addEventListener("palette:open", open);
+  })();
+</script>

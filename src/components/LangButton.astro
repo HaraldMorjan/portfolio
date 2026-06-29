@@ -1,0 +1,70 @@
+---
+// Floating language toggle for views without a header (DevView). Stacks above
+// the dark-mode button in the bottom-right corner. Switches between the two
+// locales of the current path and remembers the choice.
+import { localizedPath, LANGUAGES, DEFAULT_LANG } from "../data/i18n.js";
+
+const { lang = DEFAULT_LANG } = Astro.props;
+
+const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isEs = pathname === "/es" || pathname.startsWith("/es/");
+const base = isEs ? pathname.replace(/^\/es/, "") || "/" : pathname;
+
+const targetLang = lang === "es" ? "en" : "es";
+const target = localizedPath(targetLang, base);
+const targetName =
+  LANGUAGES.find((l) => l.code === targetLang)?.name || targetLang;
+const targetCode =
+  LANGUAGES.find((l) => l.code === targetLang)?.label || targetLang.toUpperCase();
+---
+
+<a
+  href={target}
+  data-lang-choice={targetLang}
+  hreflang={targetLang}
+  aria-label={`${targetName}`}
+  title={targetName}
+  class="group no-theme-transition fixed bottom-[13.5rem] right-6 z-[60] inline-flex h-12 w-12 items-center justify-center rounded-full border border-transparent bg-gradient-to-br from-sky-400 via-indigo-500 to-violet-500 text-white shadow-lg ring-1 ring-white/10 transition hover:scale-105 hover:shadow-indigo-500/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+>
+  <!-- Hover/focus label -->
+  <span
+    class="pointer-events-none absolute right-14 whitespace-nowrap rounded-md bg-text px-2 py-1 text-xs font-medium text-bg opacity-0 shadow-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+  >
+    {targetName}
+  </span>
+
+  <span class="relative inline-flex items-center justify-center">
+    <svg
+      class="h-5 w-5"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="10"></circle>
+      <path d="M2 12h20"></path>
+      <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+    </svg>
+    <span
+      class="absolute -bottom-1 -right-1 rounded bg-white px-1 text-[0.55rem] font-bold leading-tight text-indigo-600 shadow-sm ring-1 ring-black/5"
+      >{targetCode}</span
+    >
+  </span>
+</a>
+
+<script is:inline>
+  (function () {
+    const btn = document.querySelector("[data-lang-choice]");
+    if (!btn) return;
+    btn.addEventListener("click", () => {
+      try {
+        localStorage.setItem("lang", btn.getAttribute("data-lang-choice"));
+      } catch (e) {
+        /* ignore */
+      }
+    });
+  })();
+</script>

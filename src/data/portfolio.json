@@ -1,27 +1,617 @@
 {
-    "profile": {
-        "name": "Harald Morjan",
-        "role": "Senior Full-Stack Developer & Engineering Team Lead",
-        "tagline": "I've grown from a frontend specialist into a full-stack technical leader — architecting high-performance enterprise applications and mentoring the teams that ship them.",
-        "badges": ["11+ yrs experience", "Frontend Architecture", "React · JavaScript", ".NET · SQL Server", "MBA"],
-        "bio": "Senior Full-Stack Developer and Engineering Team Lead with nearly 12 years building, scaling, and maintaining high-performance enterprise applications across modern JavaScript, .NET, and SQL Server.",
-        "location": "Guatemala, Guatemala",
-        "about": [
-            "I am a Senior Full-Stack Developer and Engineering Team Lead with nearly 12 years of experience building, scaling, and maintaining high-performance enterprise applications.",
-            "Throughout my career, I've evolved from a dedicated frontend specialist into a full-stack technical leader. I don't just write clean, scalable code — I build and mentor the teams that do. My technical expertise spans modern JavaScript architectures, robust .NET backends, and complex SQL Server database integrations.",
-            "I hold an MBA with a focus on Project Management, which lets me bridge the gap between engineering and business. I understand that code is just a tool; the ultimate goal is to solve business problems, generate revenue, and deliver seamless user experiences. I partner effectively with product owners and stakeholders to translate business requirements into technical reality while managing technical debt and delivery timelines.",
-            "I am passionate about clean architecture, solving complex enterprise challenges, and building cultures of engineering excellence."
+    "en": {
+        "profile": {
+            "name": "Harald Morjan",
+            "role": "Senior Full-Stack Developer & Engineering Team Lead",
+            "tagline": "I've grown from a frontend specialist into a full-stack technical leader — architecting high-performance enterprise applications and mentoring the teams that ship them.",
+            "badges": [
+                "11+ yrs experience",
+                "Frontend Architecture",
+                "React · JavaScript",
+                ".NET · SQL Server",
+                "MBA"
+            ],
+            "bio": "Senior Full-Stack Developer and Engineering Team Lead with nearly 12 years building, scaling, and maintaining high-performance enterprise applications across modern JavaScript, .NET, and SQL Server.",
+            "location": "Guatemala, Guatemala",
+            "about": [
+                "I am a Senior Full-Stack Developer and Engineering Team Lead with nearly 12 years of experience building, scaling, and maintaining high-performance enterprise applications.",
+                "Throughout my career, I've evolved from a dedicated frontend specialist into a full-stack technical leader. I don't just write clean, scalable code — I build and mentor the teams that do. My technical expertise spans modern JavaScript architectures, robust .NET backends, and complex SQL Server database integrations.",
+                "I hold an MBA with a focus on Project Management, which lets me bridge the gap between engineering and business. I understand that code is just a tool; the ultimate goal is to solve business problems, generate revenue, and deliver seamless user experiences. I partner effectively with product owners and stakeholders to translate business requirements into technical reality while managing technical debt and delivery timelines.",
+                "I am passionate about clean architecture, solving complex enterprise challenges, and building cultures of engineering excellence."
+            ],
+            "mobility": "Based in Guatemala with dual citizenship (including a German passport) — unrestricted work rights across the EU and ESTA visa-free travel to the US for business.",
+            "topSkills": [
+                "Software Architecture",
+                "Front-End Development",
+                "Technical Leadership",
+                "React.js",
+                ".NET Framework"
+            ],
+            "avatar": "",
+            "resumeUrl": "",
+            "calendarUrl": "https://cal.com/harald-morjan-98kmi0"
+        },
+        "techStack": [
+            {
+                "category": "Frontend",
+                "description": "Crafting fast, consistent interfaces at enterprise scale.",
+                "items": [
+                    "Astro",
+                    "React",
+                    "ExtJS",
+                    "Vue",
+                    "JavaScript",
+                    "TypeScript",
+                    "Tailwind CSS",
+                    "Markdown",
+                    "Material UI"
+                ]
+            },
+            {
+                "category": "Backend",
+                "description": "Robust services, APIs, and real-time systems.",
+                "items": [
+                    "C#",
+                    "Express.js",
+                    "LINQ",
+                    ".NET",
+                    ".NET Core",
+                    "Node.js",
+                    "Firebase",
+                    "MongoDB",
+                    "MySQL",
+                    "SQL Server",
+                    "Socket.IO",
+                    "SignalR"
+                ]
+            },
+            {
+                "category": "DevOps",
+                "description": "Version control and continuous delivery.",
+                "items": [
+                    "GitHub",
+                    "Azure DevOps"
+                ]
+            },
+            {
+                "category": "AI",
+                "description": "AI-assisted development.",
+                "items": [
+                    "GitHub Copilot"
+                ]
+            },
+            {
+                "category": "Hosting",
+                "description": "Where I deploy and run things.",
+                "items": [
+                    "Hostgator",
+                    "Dondominio"
+                ]
+            }
         ],
-        "mobility": "Based in Guatemala with dual citizenship (including a German passport) — unrestricted work rights across the EU and ESTA visa-free travel to the US for business.",
-        "topSkills": [
-            "Software Architecture",
-            "Front-End Development",
-            "Technical Leadership",
-            "React.js",
-            ".NET Framework"
+        "projects": [
+            {
+                "title": "Sudoku",
+                "description": "A smooth, modern Sudoku game built as a React app on Astro: unique-solution puzzle generation, four difficulties, pencil notes, streak-based scoring, and hints that teach the underlying logic (naked & hidden singles) instead of just revealing answers.",
+                "tags": [
+                    "React",
+                    "Astro",
+                    "JavaScript",
+                    "Game"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/sudoku",
+                "liveUrl": "https://sudoku.hmorjan.dev/",
+                "featured": true
+            },
+            {
+                "title": "Focus Studio",
+                "description": "A Pomodoro productivity app built with Vue 3: animated focus timer, task-linked sessions, streak tracking, weekly analytics, keyboard shortcuts, and full localStorage persistence via Pinia and VueUse.",
+                "tags": [
+                    "Vue",
+                    "Pinia",
+                    "Vite",
+                    "JavaScript",
+                    "Tailwind CSS"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/focusstudio",
+                "liveUrl": "https://focus-studio.hmorjan.dev/",
+                "featured": true
+            },
+            {
+                "title": "Toolbox",
+                "description": "A collection of utilities and experiments across different technologies, used as a personal reference and sandbox.",
+                "tags": [
+                    "React",
+                    "Astro",
+                    "NodeJS",
+                    "JavaScript",
+                    "Tools"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/toolbox",
+                "liveUrl": "",
+                "featured": true
+            },
+            {
+                "title": "Scrumer",
+                "description": "Full Scrum lifecycle workspace built with React: product backlog, sprint planning, drag-and-drop board, daily standups, sprint review, retrospectives, burndown and velocity charts, and a command palette — all persisted via Zustand.",
+                "tags": [
+                    "React",
+                    "Zustand",
+                    "Vite",
+                    "JavaScript",
+                    "Tailwind CSS"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/scrumer",
+                "liveUrl": "https://scrumer.hmorjan.dev/",
+                "featured": true
+            },
+            {
+                "title": "Regex Lab",
+                "description": "Interactive regex playground built with Vue 3: live match highlighting, capture group inspection, pattern presets, heuristic token explanations, and flag toggles — persisted via Pinia and VueUse.",
+                "tags": [
+                    "Vue",
+                    "Pinia",
+                    "VueUse",
+                    "JavaScript",
+                    "Tailwind CSS"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/regexlab",
+                "liveUrl": "https://regex-lab.hmorjan.dev/",
+                "featured": true
+            },
+            {
+                "title": "Operations Console",
+                "description": "Enterprise-style operations dashboard built with Ext JS Classic: grouped service health grid, column filters, master-detail incident panel, refresh, and CSV export — patterns from real enterprise UI work.",
+                "tags": [
+                    "ExtJS",
+                    "JavaScript",
+                    "Grid",
+                    "Enterprise"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/ops-console",
+                "liveUrl": "https://ops-console.hmorjan.dev/",
+                "featured": true
+            },
+            {
+                "title": "Particle Studio",
+                "description": "Generative particle art on HTML Canvas with pure vanilla JavaScript: linked particle system, mouse attract/repel modes, live sliders, presets, and PNG screenshot export — no framework.",
+                "tags": [
+                    "JavaScript",
+                    "Canvas",
+                    "Vanilla JS",
+                    "Vite"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/particle-studio",
+                "liveUrl": "https://particle-studio.hmorjan.dev/",
+                "featured": true
+            },
+            {
+                "title": "Practice Projects",
+                "description": "A set of projects built to practice and explore new languages, frameworks, and patterns.",
+                "tags": [
+                    "JavaScript",
+                    "Learning"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/projects",
+                "liveUrl": ""
+            }
         ],
-        "avatar": "",
-        "resumeUrl": ""
+        "experience": [
+            {
+                "role": "Senior Full-Stack Developer & Team Lead",
+                "company": "Plus Technologies & Innovations",
+                "period": "Jun 2023 - Present",
+                "location": "Guatemala · Remote",
+                "description": "Leading execution and architectural decisions for a critical enterprise software suite. Acting as the core bridge between business stakeholders and technical delivery.",
+                "highlights": [
+                    "Engineering Leadership: Direct a cross-functional team, enforcing clean architecture and minimal-diff deployments via rigorous code reviews.",
+                    "Architectural Delivery: Drive the modernization of full-stack features, ensuring seamless integration between .NET backends and complex SQL Server/Oracle databases.",
+                    "Process Optimization: Championed Agile methodologies and Azure DevOps CI/CD pipelines, establishing Git hooks to streamline developer workflows.",
+                    "Mentorship: Mentor developers in secure dynamic SQL generation, PII compliance, and modern JavaScript performance optimization."
+                ],
+                "skills": [
+                    "Agile Methodologies",
+                    "Software Architecture",
+                    "SignalR",
+                    "Astro",
+                    ".NET Framework",
+                    "Technical Leadership",
+                    "Vue.js",
+                    "Azure DevOps Services",
+                    "Scrum",
+                    "Microsoft SQL Server",
+                    "Team Mentoring"
+                ]
+            },
+            {
+                "role": "Senior Full Stack Developer",
+                "company": "Plus Technologies & Innovations",
+                "period": "Jan 2022 - Jun 2023",
+                "location": "Guatemala · Remote",
+                "description": "Transitioned to full-stack responsibilities to architect end-to-end features, optimizing data flow from the database to the client UI.",
+                "highlights": [
+                    "End-to-End Development: Engineered scalable features using C#/.NET for backend services and modern JavaScript for the frontend.",
+                    "Data Engineering: Designed and optimized complex SQL queries and stored procedures, significantly improving data retrieval times for enterprise dashboards.",
+                    "System Security: Implemented robust backend validations and secure data handling protocols to ensure enterprise compliance.",
+                    "Cross-Team Collaboration: Worked directly with product teams to translate business requirements into technical specifications and scalable code."
+                ],
+                "skills": [
+                    "RESTful Architecture",
+                    ".NET Framework",
+                    "Systems Engineering",
+                    "Modern JavaScript",
+                    "Microsoft SQL Server",
+                    "C#"
+                ]
+            },
+            {
+                "role": "Senior Frontend Developer",
+                "company": "Plus Technologies & Innovations",
+                "period": "Jan 2019 - Dec 2021",
+                "location": "Guatemala · Remote",
+                "description": "Promoted to lead the frontend architecture for the enterprise suite, focusing on performance, scalability, and UI consistency across thousands of application screens.",
+                "highlights": [
+                    "Frontend Architecture: Designed and implemented robust UI modules using ExtJS/Sencha, supporting complex data grids and dynamic workflows.",
+                    "Global Solutions: Architected global override solutions and custom CSS frameworks to enforce visual consistency and eliminate redundant code across the application.",
+                    "Performance Optimization: Identified and resolved UI bottlenecks, improving rendering times for data-heavy enterprise screens.",
+                    "Code Standardization: Established frontend coding standards and led refactoring initiatives to transition legacy code to modern ES2015+ practices."
+                ],
+                "skills": [
+                    "React.js",
+                    "HTML5",
+                    "JavaScript eXtension (JSX)",
+                    "Front-end Engineering",
+                    "Ext JS",
+                    "Modern JavaScript",
+                    "Web Performance",
+                    "CSS"
+                ]
+            },
+            {
+                "role": "Frontend Developer",
+                "company": "Plus Technologies & Innovations",
+                "period": "Jan 2015 - Dec 2018",
+                "location": "Guatemala · On-site",
+                "description": "Developed and maintained core frontend features for financial and monitoring applications, ensuring high reliability and user accessibility.",
+                "highlights": [
+                    "UI Development: Built interactive, responsive user interfaces translating design mockups into functional code.",
+                    "API Integration: Collaborated with backend engineers to consume RESTful APIs, implementing secure data mapping and client-side error handling.",
+                    "Bug Resolution: Triaged and resolved complex UI bugs in production environments, improving overall system stability.",
+                    "Continuous Learning: Rapidly adapted to evolving frontend frameworks and internal tooling to support business delivery."
+                ],
+                "skills": [
+                    "JavaScript",
+                    "JSON",
+                    "RESTful APIs",
+                    "HTML",
+                    "CSS",
+                    "UI Development"
+                ]
+            },
+            {
+                "role": "Mobile Software Developer",
+                "company": "Plus Technologies & Innovations",
+                "period": "Aug 2014 - Jan 2015",
+                "location": "Guatemala · On-site",
+                "description": "Began my career at PlusTI focusing on mobile application development and foundational software engineering practices.",
+                "highlights": [
+                    "Contributed to the development and testing of mobile features to support the broader enterprise ecosystem.",
+                    "Participated in daily stand-ups and code reviews to ensure alignment with team standards."
+                ],
+                "skills": [
+                    "Mobile User Experience",
+                    "Mobile Application Development",
+                    "Usability Engineering"
+                ]
+            }
+        ]
+    },
+    "es": {
+        "profile": {
+            "name": "Harald Morjan",
+            "role": "Desarrollador Full-Stack Senior y Líder Técnico de Equipo",
+            "tagline": "Pasé de ser especialista en frontend a líder técnico full-stack — diseñando la arquitectura de aplicaciones empresariales de alto rendimiento y formando a los equipos que las llevan a producción.",
+            "badges": [
+                "11+ años de experiencia",
+                "Arquitectura Frontend",
+                "React · JavaScript",
+                ".NET · SQL Server",
+                "MBA"
+            ],
+            "bio": "Desarrollador Full-Stack Senior y Líder Técnico de Equipo con casi 12 años construyendo, escalando y manteniendo aplicaciones empresariales de alto rendimiento con JavaScript moderno, .NET y SQL Server.",
+            "location": "Guatemala, Guatemala",
+            "about": [
+                "Soy Desarrollador Full-Stack Senior y Líder Técnico de Equipo con casi 12 años de experiencia construyendo, escalando y manteniendo aplicaciones empresariales de alto rendimiento.",
+                "A lo largo de mi carrera evolucioné de especialista frontend dedicado a líder técnico full-stack. No solo escribo código limpio y escalable — construyo y formo a los equipos que lo hacen. Mi experiencia técnica abarca arquitecturas modernas de JavaScript, backends robustos en .NET e integraciones complejas con bases de datos SQL Server.",
+                "Tengo un MBA con enfoque en Gestión de Proyectos, lo que me permite tender un puente entre la ingeniería y el negocio. Entiendo que el código es solo una herramienta; el objetivo final es resolver problemas de negocio, generar ingresos y entregar experiencias de usuario impecables. Colaboro de forma efectiva con product owners y stakeholders para traducir requisitos de negocio en realidad técnica, gestionando la deuda técnica y los tiempos de entrega.",
+                "Me apasiona la arquitectura limpia, resolver retos empresariales complejos y construir culturas de excelencia en ingeniería."
+            ],
+            "mobility": "Radicado en Guatemala con doble nacionalidad (incluido pasaporte alemán) — derecho a trabajar sin restricciones en la UE y viajes de negocios a EE. UU. sin visa mediante ESTA.",
+            "topSkills": [
+                "Arquitectura de Software",
+                "Desarrollo Front-End",
+                "Liderazgo Técnico",
+                "React.js",
+                ".NET Framework"
+            ],
+            "avatar": "",
+            "resumeUrl": "",
+            "calendarUrl": "https://cal.com/harald-morjan-98kmi0"
+        },
+        "techStack": [
+            {
+                "category": "Frontend",
+                "description": "Interfaces rápidas y consistentes a escala empresarial.",
+                "items": [
+                    "Astro",
+                    "React",
+                    "ExtJS",
+                    "Vue",
+                    "JavaScript",
+                    "TypeScript",
+                    "Tailwind CSS",
+                    "Markdown",
+                    "Material UI"
+                ]
+            },
+            {
+                "category": "Backend",
+                "description": "Servicios robustos, APIs y sistemas en tiempo real.",
+                "items": [
+                    "C#",
+                    "Express.js",
+                    "LINQ",
+                    ".NET",
+                    ".NET Core",
+                    "Node.js",
+                    "Firebase",
+                    "MongoDB",
+                    "MySQL",
+                    "SQL Server",
+                    "Socket.IO",
+                    "SignalR"
+                ]
+            },
+            {
+                "category": "DevOps",
+                "description": "Control de versiones y entrega continua.",
+                "items": [
+                    "GitHub",
+                    "Azure DevOps"
+                ]
+            },
+            {
+                "category": "AI",
+                "description": "Desarrollo asistido por IA.",
+                "items": [
+                    "GitHub Copilot"
+                ]
+            },
+            {
+                "category": "Hosting",
+                "description": "Dónde despliego y ejecuto las cosas.",
+                "items": [
+                    "Hostgator",
+                    "Dondominio"
+                ]
+            }
+        ],
+        "projects": [
+            {
+                "title": "Sudoku",
+                "description": "Un juego de Sudoku moderno y fluido construido como app React sobre Astro: generación de puzzles con solución única, cuatro dificultades, notas a lápiz, puntuación por rachas y pistas que enseñan la lógica subyacente (singles desnudos y ocultos) en lugar de solo revelar respuestas.",
+                "tags": [
+                    "React",
+                    "Astro",
+                    "JavaScript",
+                    "Game"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/sudoku",
+                "liveUrl": "https://sudoku.hmorjan.dev/",
+                "featured": true
+            },
+            {
+                "title": "Focus Studio",
+                "description": "App de productividad Pomodoro construida con Vue 3: temporizador animado, sesiones vinculadas a tareas, rachas, analíticas semanales, atajos de teclado y persistencia completa en localStorage con Pinia y VueUse.",
+                "tags": [
+                    "Vue",
+                    "Pinia",
+                    "Vite",
+                    "JavaScript",
+                    "Tailwind CSS"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/focusstudio",
+                "liveUrl": "https://focus-studio.hmorjan.dev/",
+                "featured": true
+            },
+            {
+                "title": "Toolbox",
+                "description": "Una colección de utilidades y experimentos en distintas tecnologías, usada como referencia personal y espacio de pruebas.",
+                "tags": [
+                    "React",
+                    "Astro",
+                    "NodeJS",
+                    "JavaScript",
+                    "Tools"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/toolbox",
+                "liveUrl": "",
+                "featured": true
+            },
+            {
+                "title": "Scrumer",
+                "description": "Workspace completo del ciclo Scrum construido con React: backlog de producto, planificación de sprints, tablero con drag-and-drop, daily standups, sprint review, retrospectivas, gráficos de burndown y velocity, y paleta de comandos — todo persistido con Zustand.",
+                "tags": [
+                    "React",
+                    "Zustand",
+                    "Vite",
+                    "JavaScript",
+                    "Tailwind CSS"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/scrumer",
+                "liveUrl": "https://scrumer.hmorjan.dev/",
+                "featured": true
+            },
+            {
+                "title": "Regex Lab",
+                "description": "Playground interactivo de expresiones regulares construido con Vue 3: resaltado de coincidencias en vivo, inspección de grupos de captura, presets de patrones, explicaciones heurísticas de tokens y toggles de flags — persistido con Pinia y VueUse.",
+                "tags": [
+                    "Vue",
+                    "Pinia",
+                    "VueUse",
+                    "JavaScript",
+                    "Tailwind CSS"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/regexlab",
+                "liveUrl": "https://regex-lab.hmorjan.dev/",
+                "featured": true
+            },
+            {
+                "title": "Operations Console",
+                "description": "Dashboard de operaciones estilo empresarial construido con Ext JS Classic: grid de salud de servicios agrupado, filtros de columna, panel maestro-detalle de incidentes, refresh y exportación CSV — patrones de UI empresarial real.",
+                "tags": [
+                    "ExtJS",
+                    "JavaScript",
+                    "Grid",
+                    "Enterprise"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/ops-console",
+                "liveUrl": "https://ops-console.hmorjan.dev/",
+                "featured": true
+            },
+            {
+                "title": "Particle Studio",
+                "description": "Arte generativo de partículas en HTML Canvas con JavaScript puro: sistema de partículas enlazadas, modos atraer/repel del mouse, sliders en vivo, presets y exportación PNG — sin framework.",
+                "tags": [
+                    "JavaScript",
+                    "Canvas",
+                    "Vanilla JS",
+                    "Vite"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/particle-studio",
+                "liveUrl": "https://particle-studio.hmorjan.dev/",
+                "featured": true
+            },
+            {
+                "title": "Proyectos de Práctica",
+                "description": "Un conjunto de proyectos creados para practicar y explorar nuevos lenguajes, frameworks y patrones.",
+                "tags": [
+                    "JavaScript",
+                    "Learning"
+                ],
+                "repoUrl": "https://github.com/HaraldMorjan/projects",
+                "liveUrl": ""
+            }
+        ],
+        "experience": [
+            {
+                "role": "Desarrollador Full-Stack Senior y Líder de Equipo",
+                "company": "Plus Technologies & Innovations",
+                "period": "Jun 2023 - Presente",
+                "location": "Guatemala · Remoto",
+                "description": "Lidero la ejecución y las decisiones de arquitectura de una suite de software empresarial crítica. Actúo como puente clave entre los stakeholders de negocio y la entrega técnica.",
+                "highlights": [
+                    "Liderazgo de Ingeniería: Dirijo un equipo multidisciplinario, aplicando arquitectura limpia y despliegues de cambios mínimos mediante revisiones de código rigurosas.",
+                    "Entrega Arquitectónica: Impulso la modernización de funcionalidades full-stack, asegurando una integración fluida entre backends .NET y bases de datos complejas SQL Server/Oracle.",
+                    "Optimización de Procesos: Promoví metodologías ágiles y pipelines CI/CD en Azure DevOps, estableciendo Git hooks para agilizar el flujo de trabajo de los desarrolladores.",
+                    "Mentoría: Asesoro a desarrolladores en generación segura de SQL dinámico, cumplimiento de PII y optimización de rendimiento en JavaScript moderno."
+                ],
+                "skills": [
+                    "Metodologías Ágiles",
+                    "Arquitectura de Software",
+                    "SignalR",
+                    "Astro",
+                    ".NET Framework",
+                    "Liderazgo Técnico",
+                    "Vue.js",
+                    "Azure DevOps Services",
+                    "Scrum",
+                    "Microsoft SQL Server",
+                    "Mentoría de Equipo"
+                ]
+            },
+            {
+                "role": "Desarrollador Full Stack Senior",
+                "company": "Plus Technologies & Innovations",
+                "period": "Ene 2022 - Jun 2023",
+                "location": "Guatemala · Remoto",
+                "description": "Asumí responsabilidades full-stack para diseñar la arquitectura de funcionalidades de extremo a extremo, optimizando el flujo de datos desde la base de datos hasta la interfaz de usuario.",
+                "highlights": [
+                    "Desarrollo de Extremo a Extremo: Construí funcionalidades escalables usando C#/.NET para los servicios de backend y JavaScript moderno para el frontend.",
+                    "Ingeniería de Datos: Diseñé y optimicé consultas SQL complejas y procedimientos almacenados, mejorando significativamente los tiempos de recuperación de datos en dashboards empresariales.",
+                    "Seguridad del Sistema: Implementé validaciones robustas de backend y protocolos seguros de manejo de datos para garantizar el cumplimiento empresarial.",
+                    "Colaboración entre Equipos: Trabajé directamente con los equipos de producto para traducir requisitos de negocio en especificaciones técnicas y código escalable."
+                ],
+                "skills": [
+                    "Arquitectura RESTful",
+                    ".NET Framework",
+                    "Ingeniería de Sistemas",
+                    "JavaScript Moderno",
+                    "Microsoft SQL Server",
+                    "C#"
+                ]
+            },
+            {
+                "role": "Desarrollador Frontend Senior",
+                "company": "Plus Technologies & Innovations",
+                "period": "Ene 2019 - Dic 2021",
+                "location": "Guatemala · Remoto",
+                "description": "Promovido para liderar la arquitectura frontend de la suite empresarial, enfocándome en rendimiento, escalabilidad y consistencia de UI en miles de pantallas de la aplicación.",
+                "highlights": [
+                    "Arquitectura Frontend: Diseñé e implementé módulos de UI robustos con ExtJS/Sencha, soportando grids de datos complejos y flujos de trabajo dinámicos.",
+                    "Soluciones Globales: Diseñé soluciones de override globales y frameworks CSS personalizados para imponer consistencia visual y eliminar código redundante en toda la aplicación.",
+                    "Optimización de Rendimiento: Identifiqué y resolví cuellos de botella de UI, mejorando los tiempos de renderizado en pantallas empresariales con gran volumen de datos.",
+                    "Estandarización de Código: Establecí estándares de código frontend y lideré iniciativas de refactorización para migrar código heredado a prácticas modernas ES2015+."
+                ],
+                "skills": [
+                    "React.js",
+                    "HTML5",
+                    "JavaScript eXtension (JSX)",
+                    "Ingeniería Front-end",
+                    "Ext JS",
+                    "JavaScript Moderno",
+                    "Rendimiento Web",
+                    "CSS"
+                ]
+            },
+            {
+                "role": "Desarrollador Frontend",
+                "company": "Plus Technologies & Innovations",
+                "period": "Ene 2015 - Dic 2018",
+                "location": "Guatemala · Presencial",
+                "description": "Desarrollé y mantuve funcionalidades frontend clave para aplicaciones financieras y de monitoreo, asegurando alta confiabilidad y accesibilidad para el usuario.",
+                "highlights": [
+                    "Desarrollo de UI: Construí interfaces de usuario interactivas y responsivas, traduciendo mockups de diseño en código funcional.",
+                    "Integración de APIs: Colaboré con ingenieros de backend para consumir APIs RESTful, implementando mapeo seguro de datos y manejo de errores en el cliente.",
+                    "Resolución de Bugs: Diagnostiqué y resolví bugs complejos de UI en entornos de producción, mejorando la estabilidad general del sistema.",
+                    "Aprendizaje Continuo: Me adapté rápidamente a frameworks frontend en evolución y a herramientas internas para apoyar la entrega de negocio."
+                ],
+                "skills": [
+                    "JavaScript",
+                    "JSON",
+                    "APIs RESTful",
+                    "HTML",
+                    "CSS",
+                    "Desarrollo de UI"
+                ]
+            },
+            {
+                "role": "Desarrollador de Software Móvil",
+                "company": "Plus Technologies & Innovations",
+                "period": "Ago 2014 - Ene 2015",
+                "location": "Guatemala · Presencial",
+                "description": "Inicié mi carrera en PlusTI enfocándome en el desarrollo de aplicaciones móviles y en prácticas fundamentales de ingeniería de software.",
+                "highlights": [
+                    "Contribuí al desarrollo y prueba de funcionalidades móviles para apoyar el ecosistema empresarial más amplio.",
+                    "Participé en stand-ups diarios y revisiones de código para asegurar la alineación con los estándares del equipo."
+                ],
+                "skills": [
+                    "Experiencia de Usuario Móvil",
+                    "Desarrollo de Aplicaciones Móviles",
+                    "Ingeniería de Usabilidad"
+                ]
+            }
+        ]
     },
     "socials": [
         {
@@ -35,205 +625,6 @@
         {
             "label": "Email",
             "href": "mailto:harald.morjan@gmail.com"
-        }
-    ],
-    "techStack": [
-        {
-            "category": "Frontend",
-            "description": "Crafting fast, consistent interfaces at enterprise scale.",
-            "items": [
-                "Astro",
-                "React",
-                "ExtJS",
-                "Vue",
-                "JavaScript",
-                "TypeScript",
-                "Tailwind CSS",
-                "Markdown",
-                "Material UI"
-            ]
-        },
-        {
-            "category": "Backend",
-            "description": "Robust services, APIs, and real-time systems.",
-            "items": [
-                "C#",
-                "Express.js",
-                "LINQ",
-                ".NET",
-                ".NET Core",
-                "Node.js",
-                "Firebase",
-                "MongoDB",
-                "MySQL",
-                "SQL Server",
-                "Socket.IO",
-                "SignalR"
-            ]
-        },
-        {
-            "category": "DevOps",
-            "description": "Version control and continuous delivery.",
-            "items": [
-                "GitHub",
-                "Azure DevOps"
-            ]
-        },
-        {
-            "category": "AI",
-            "description": "AI-assisted development.",
-            "items": [
-                "GitHub Copilot"
-            ]
-        },
-        {
-            "category": "Hosting",
-            "description": "Where I deploy and run things.",
-            "items": [
-                "Hostgator",
-                "Dondominio"
-            ]
-        }
-    ],
-    "projects": [
-        {
-            "title": "Toolbox",
-            "description": "A collection of utilities and experiments across different technologies, used as a personal reference and sandbox.",
-            "tags": [
-                "JavaScript",
-                "Tools"
-            ],
-            "repoUrl": "https://github.com/HaraldMorjan/toolbox",
-            "liveUrl": "",
-            "featured": true
-        },
-        {
-            "title": "MPAssistant",
-            "description": "An assistant application exploring automation and productivity workflows.",
-            "tags": [
-                "JavaScript"
-            ],
-            "repoUrl": "https://github.com/HaraldMorjan/Assistant",
-            "liveUrl": ""
-        },
-        {
-            "title": "Practice Projects",
-            "description": "A set of projects built to practice and explore new languages, frameworks, and patterns.",
-            "tags": [
-                "JavaScript",
-                "Learning"
-            ],
-            "repoUrl": "https://github.com/HaraldMorjan/projects",
-            "liveUrl": ""
-        }
-    ],
-    "experience": [
-        {
-            "role": "Senior Full-Stack Developer & Team Lead",
-            "company": "Plus Technologies & Innovations",
-            "period": "Jun 2023 - Present",
-            "location": "Guatemala · Remote",
-            "description": "Leading execution and architectural decisions for a critical enterprise software suite. Acting as the core bridge between business stakeholders and technical delivery.",
-            "highlights": [
-                "Engineering Leadership: Direct a cross-functional team, enforcing clean architecture and minimal-diff deployments via rigorous code reviews.",
-                "Architectural Delivery: Drive the modernization of full-stack features, ensuring seamless integration between .NET backends and complex SQL Server/Oracle databases.",
-                "Process Optimization: Championed Agile methodologies and Azure DevOps CI/CD pipelines, establishing Git hooks to streamline developer workflows.",
-                "Mentorship: Mentor developers in secure dynamic SQL generation, PII compliance, and modern JavaScript performance optimization."
-            ],
-            "skills": [
-                "Agile Methodologies",
-                "Software Architecture",
-                "SignalR",
-                "Astro",
-                ".NET Framework",
-                "Technical Leadership",
-                "Vue.js",
-                "Azure DevOps Services",
-                "Scrum",
-                "Microsoft SQL Server",
-                "Team Mentoring"
-            ]
-        },
-        {
-            "role": "Senior Full Stack Developer",
-            "company": "Plus Technologies & Innovations",
-            "period": "Jan 2022 - Jun 2023",
-            "location": "Guatemala · Remote",
-            "description": "Transitioned to full-stack responsibilities to architect end-to-end features, optimizing data flow from the database to the client UI.",
-            "highlights": [
-                "End-to-End Development: Engineered scalable features using C#/.NET for backend services and modern JavaScript for the frontend.",
-                "Data Engineering: Designed and optimized complex SQL queries and stored procedures, significantly improving data retrieval times for enterprise dashboards.",
-                "System Security: Implemented robust backend validations and secure data handling protocols to ensure enterprise compliance.",
-                "Cross-Team Collaboration: Worked directly with product teams to translate business requirements into technical specifications and scalable code."
-            ],
-            "skills": [
-                "RESTful Architecture",
-                ".NET Framework",
-                "Systems Engineering",
-                "Modern JavaScript",
-                "Microsoft SQL Server",
-                "C#"
-            ]
-        },
-        {
-            "role": "Senior Frontend Developer",
-            "company": "Plus Technologies & Innovations",
-            "period": "Jan 2019 - Dec 2021",
-            "location": "Guatemala · Remote",
-            "description": "Promoted to lead the frontend architecture for the enterprise suite, focusing on performance, scalability, and UI consistency across thousands of application screens.",
-            "highlights": [
-                "Frontend Architecture: Designed and implemented robust UI modules using ExtJS/Sencha, supporting complex data grids and dynamic workflows.",
-                "Global Solutions: Architected global override solutions and custom CSS frameworks to enforce visual consistency and eliminate redundant code across the application.",
-                "Performance Optimization: Identified and resolved UI bottlenecks, improving rendering times for data-heavy enterprise screens.",
-                "Code Standardization: Established frontend coding standards and led refactoring initiatives to transition legacy code to modern ES2015+ practices."
-            ],
-            "skills": [
-                "React.js",
-                "HTML5",
-                "JavaScript eXtension (JSX)",
-                "Front-end Engineering",
-                "Ext JS",
-                "Modern JavaScript",
-                "Web Performance",
-                "CSS"
-            ]
-        },
-        {
-            "role": "Frontend Developer",
-            "company": "Plus Technologies & Innovations",
-            "period": "Jan 2015 - Dec 2018",
-            "location": "Guatemala · On-site",
-            "description": "Developed and maintained core frontend features for financial and monitoring applications, ensuring high reliability and user accessibility.",
-            "highlights": [
-                "UI Development: Built interactive, responsive user interfaces translating design mockups into functional code.",
-                "API Integration: Collaborated with backend engineers to consume RESTful APIs, implementing secure data mapping and client-side error handling.",
-                "Bug Resolution: Triaged and resolved complex UI bugs in production environments, improving overall system stability.",
-                "Continuous Learning: Rapidly adapted to evolving frontend frameworks and internal tooling to support business delivery."
-            ],
-            "skills": [
-                "JavaScript",
-                "JSON",
-                "RESTful APIs",
-                "HTML",
-                "CSS",
-                "UI Development"
-            ]
-        },
-        {
-            "role": "Mobile Software Developer",
-            "company": "Plus Technologies & Innovations",
-            "period": "Aug 2014 - Jan 2015",
-            "location": "Guatemala · On-site",
-            "description": "Began my career at PlusTI focusing on mobile application development and foundational software engineering practices.",
-            "highlights": [
-                "Contributed to the development and testing of mobile features to support the broader enterprise ecosystem.",
-                "Participated in daily stand-ups and code reviews to ensure alignment with team standards."
-            ],
-            "skills": [
-                "Mobile User Experience",
-                "Mobile Application Development",
-                "Usability Engineering"
-            ]
         }
     ]
 }

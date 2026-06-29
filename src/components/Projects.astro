@@ -1,7 +1,10 @@
 ---
 import ProjectsContent from "./sections/ProjectsContent.astro";
+import { DEFAULT_LANG } from "../data/i18n.js";
+
+const { lang = DEFAULT_LANG } = Astro.props;
 ---
 
-<section id="projects" class="mx-auto max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-  <ProjectsContent />
+<section id="projects" class="mx-auto max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+  <ProjectsContent lang={lang} />
 </section>

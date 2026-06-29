@@ -1,12 +1,38 @@
 ---
 import { socials } from "../data/portfolio";
 
-const { class: className = "" } = Astro.props;
+// `emailAsForm`: render the Email entry as a button that opens the shared
+// contact modal (via data-contact-open) instead of a mailto: link.
+const { class: className = "", emailAsForm = false, emailAccent = false } = Astro.props;
+
+const itemClass =
+  "inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted transition hover:-translate-y-0.5 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent";
+
+// Accent-styled email button matches the contact CTA colors.
+const emailBtnClass = emailAccent
+  ? "inline-flex h-9 w-9 items-center justify-center rounded-lg border border-accent-strong bg-accent-strong text-accent-contrast shadow-sm transition hover:-translate-y-0.5 hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+  : itemClass;
 ---
 
 <ul class={`flex items-center gap-2 ${className}`}>
   {
-    socials.map((s) => (
+    socials.map((s) =>
+      emailAsForm && s.label === "Email" ? (
+        <li>
+          <button
+            type="button"
+            data-contact-open
+            aria-label={s.label}
+            title={s.label}
+            class={emailBtnClass}
+          >
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <rect x="2" y="4" width="20" height="16" rx="2" />
+              <path d="m22 7-10 6L2 7" />
+            </svg>
+          </button>
+        </li>
+      ) : (
       <li>
         <a
           href={s.href}
@@ -14,7 +40,7 @@ const { class: className = "" } = Astro.props;
           rel="noopener noreferrer"
           aria-label={s.label}
           title={s.label}
-          class="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted transition hover:-translate-y-0.5 hover:border-accent hover:text-accent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+          class={itemClass}
         >
           {s.label === "GitHub" && (
             <svg class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
@@ -46,6 +72,7 @@ const { class: className = "" } = Astro.props;
           )}
         </a>
       </li>
-    ))
+      ),
+    )
   }
 </ul>

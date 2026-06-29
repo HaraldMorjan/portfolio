@@ -1,0 +1,35 @@
+---
+import Layout from "../layouts/Layout.astro";
+import Nav from "./Nav.astro";
+import Hero from "./Hero.astro";
+import About from "./About.astro";
+import TechStack from "./TechStack.astro";
+import Projects from "./Projects.astro";
+import Experience from "./Experience.astro";
+import Contact from "./Contact.astro";
+import ContactModal from "./ContactModal.astro";
+import Footer from "./Footer.astro";
+import ThemeStudio from "./ThemeStudio.astro";
+import DevModeButton from "./DevModeButton.astro";
+import DarkModeButton from "./DarkModeButton.astro";
+import { DEFAULT_LANG } from "../data/i18n.js";
+
+const { lang = DEFAULT_LANG } = Astro.props;
+---
+
+<Layout lang={lang}>
+  <Nav lang={lang} />
+  <main id="main">
+    <Hero lang={lang} />
+    <About lang={lang} />
+    <TechStack lang={lang} />
+    <Projects lang={lang} />
+    <Experience lang={lang} />
+    <Contact lang={lang} />
+  </main>
+  <Footer lang={lang} />
+  <ContactModal lang={lang} />
+  <DarkModeButton />
+  <DevModeButton lang={lang} />
+  <ThemeStudio />
+</Layout>

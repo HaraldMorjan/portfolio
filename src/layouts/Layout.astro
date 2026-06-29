@@ -1,6 +1,11 @@
 ---
 import "../styles/global.css";
-import { profile, socials } from "../data/portfolio";
+import { getPortfolio } from "../data/portfolio";
+import { getUi, DEFAULT_LANG } from "../data/i18n.js";
+
+const { lang = DEFAULT_LANG } = Astro.props;
+const { profile, socials } = getPortfolio(lang);
+const ui = getUi(lang);
 
 const {
   title = `${profile.name} - ${profile.role}`,
@@ -9,7 +14,7 @@ const {
 
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const ogImage = new URL("/og.png", Astro.site).href;
-const siteName = `${profile.name} — Portfolio`;
+const siteName = `${profile.name} — ${ui.siteName}`;
 
 const sameAs = socials
   .map((s) => s.href)
@@ -35,7 +40,7 @@ const personLd = {
 ---
 
 <!doctype html>
-<html lang="en" class="scroll-smooth">
+<html lang={ui.htmlLang} class="scroll-smooth">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -48,6 +53,7 @@ const personLd = {
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content={ui.ogLocale} />
     <meta property="og:site_name" content={siteName} />
     <meta property="og:url" content={canonical} />
     <meta property="og:title" content={title} />
@@ -61,13 +67,66 @@ const personLd = {
     <!-- Structured data -->
     <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
 
-    <!-- Fonts -->
+    <!-- Fonts — loaded asynchronously so they never block first paint.
+         The stylesheet is fetched with media="print" then flipped to "all"
+         on load; <noscript> keeps it working without JS. -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
+      rel="preload"
+      as="style"
       href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
     />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      media="print"
+      onload="this.media='all'"
+    />
+    <noscript>
+      <link
+        rel="stylesheet"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+      />
+    </noscript>
+
+    <!-- Locale auto-detect: only runs at genuine entry points (external link,
+         typed URL, first visit). An explicit choice saved in localStorage wins,
+         otherwise the browser language is used. In-app navigation (same-origin
+         referrer) is left untouched so links like devMode keep their locale.
+         English is served at "/", Spanish under "/es/". Preserves search+hash. -->
+    <script is:inline>
+      (function () {
+        try {
+          // Don't redirect on internal navigation; respect the clicked locale.
+          if (
+            document.referrer &&
+            document.referrer.indexOf(location.origin) === 0
+          ) {
+            return;
+          }
+          var path = location.pathname;
+          var isEs = path === "/es" || path.indexOf("/es/") === 0;
+          var current = isEs ? "es" : "en";
+          var stored = localStorage.getItem("lang");
+          var desired = stored
+            ? stored
+            : (navigator.language || "en").toLowerCase().slice(0, 2);
+          desired = desired === "es" ? "es" : "en";
+          if (desired !== current) {
+            var base = isEs ? path.replace(/^\/es/, "") || "/" : path;
+            var target =
+              desired === "es" ? "/es" + (base === "/" ? "/" : base) : base;
+            if (target !== path) {
+              location.replace(target + location.search + location.hash);
+              return;
+            }
+          }
+        } catch (e) {
+          /* ignore and render as-is */
+        }
+      })();
+    </script>
 
     <!-- No-flash theme: runs before paint to set the right class on <html>
          and apply any Theme Studio overrides (from URL hash or localStorage). -->
@@ -75,14 +134,19 @@ const personLd = {
       (function () {
         const root = document.documentElement;
         const stored = localStorage.getItem("theme");
-        const prefersDark = window.matchMedia(
-          "(prefers-color-scheme: dark)",
-        ).matches;
-        if (stored === "dark" || (!stored && prefersDark)) {
+        const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+        if (stored === "dark" || (!stored && systemDark.matches)) {
           root.classList.add("dark");
         } else {
           root.classList.remove("dark");
         }
+
+        // Follow the system preference live, until the user makes an explicit
+        // choice (which is persisted in localStorage by the dark-mode toggle).
+        systemDark.addEventListener("change", (e) => {
+          if (localStorage.getItem("theme")) return;
+          root.classList.toggle("dark", e.matches);
+        });
 
         try {
           let raw = null;
@@ -110,7 +174,7 @@ const personLd = {
   <body class="font-sans">
     <a
       href="#main"
-      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-accent focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-accent-contrast focus:shadow-lg focus:outline-2 focus:outline-offset-2 focus:outline-accent"
+      class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[100] focus:rounded-lg focus:bg-accent-strong focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-accent-contrast focus:shadow-lg focus:outline-2 focus:outline-offset-2 focus:outline-accent"
       >Skip to content</a
     >
     <slot />

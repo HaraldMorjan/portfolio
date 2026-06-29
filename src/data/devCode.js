@@ -15,7 +15,9 @@ function listLines(items, indent) {
 }
 
 /** about.ts - the tech stack + profile expressed as TypeScript. */
-export function aboutTs(p) {
+export function aboutTs(p, t = {}) {
+  const skillsComment =
+    t.skillsComment || "Flatten every category into a single skills list";
   const stack = p.techStack
     .map((c) => `  ${camel(c.category)}: [\n${listLines(c.items, "    ")}\n  ],`)
     .join("\n");
@@ -38,7 +40,7 @@ const me: Developer = {
   available: true,
 };
 
-// Flatten every category into a single skills list
+// ${skillsComment}
 const skills: string[] = Object.values(techStack).flat();
 
 export { me, techStack, skills };
@@ -101,7 +103,9 @@ export function projectsMd(p) {
 }
 
 /** README.md - bio, experience and contact rendered as Markdown. */
-export function readmeMd(p) {
+export function readmeMd(p, t = {}) {
+  const experienceHeading = t.readmeExperience || "Experience";
+  const connectHeading = t.readmeConnect || "Connect";
   const experience = p.experience
     .map((e) => `- **${e.role}** @ ${e.company} _(${e.period})_\n  ${e.description}`)
     .join("\n");
@@ -118,11 +122,11 @@ export function readmeMd(p) {
 
 ${p.profile.bio}
 
-## Experience
+## ${experienceHeading}
 
 ${experience}
 
-## Connect
+## ${connectHeading}
 
 ${socials}
 `;

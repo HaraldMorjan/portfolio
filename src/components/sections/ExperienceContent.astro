@@ -1,13 +1,34 @@
 ---
-import { experience } from "../../data/portfolio";
+import { getPortfolio } from "../../data/portfolio";
+import { getUi, DEFAULT_LANG } from "../../data/i18n.js";
 import ExperienceTimeline from "../vue/ExperienceTimeline.vue";
+
+const { lang = DEFAULT_LANG } = Astro.props;
+const { experience } = getPortfolio(lang);
+const t = getUi(lang).experience;
+const strings = {
+  all: t.all,
+  filterPromptTpl: t.filterPromptTpl,
+  showingTpl: t.showingTpl,
+  present: t.present,
+  yr: t.yr,
+  yrs: t.yrs,
+  mo: t.mo,
+  mos: t.mos,
+  builtWith: t.builtWith,
+};
 ---
 
 <div class="max-w-2xl">
   <h2 class="text-sm font-semibold uppercase tracking-widest text-accent">
-    Experience
+    {t.eyebrow}
   </h2>
-  <p class="mt-2 text-3xl font-bold text-text">Where I've worked</p>
+  <p class="mt-2 text-3xl font-bold text-text">{t.title}</p>
 </div>
 
-<ExperienceTimeline client:visible experience={experience} />
+<ExperienceTimeline
+  client:visible
+  experience={experience}
+  lang={lang}
+  strings={strings}
+/>

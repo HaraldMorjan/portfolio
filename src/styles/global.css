@@ -17,6 +17,10 @@
   --muted: #64748b;
   --border: #e2e8f0;
   --accent: #1a66f0;
+  /* Solid-fill accent for buttons/badges that carry white text. Kept dark
+     enough that #fff clears WCAG AA (>=4.5:1). In light mode it matches
+     --accent; in dark mode it's a deeper blue so labels stay legible. */
+  --accent-strong: #1a66f0;
   --accent-contrast: #ffffff;
   --hover: rgba(15, 23, 42, 0.05);
 
@@ -32,6 +36,7 @@
   --muted: #94a3b8;
   --border: #1e293b;
   --accent: #3385ff;
+  --accent-strong: #2563eb;
   --accent-contrast: #ffffff;
   --hover: rgba(255, 255, 255, 0.08);
 }
@@ -45,6 +50,7 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-accent: var(--accent);
+  --color-accent-strong: var(--accent-strong);
   --color-accent-contrast: var(--accent-contrast);
   --color-hover: var(--hover);
 
@@ -151,6 +157,21 @@ body {
   animation: fade-up 0.6s ease-out both;
 }
 
+/* Transform-only entrance: slides up without ramping opacity from 0. Used for
+   the hero's largest text so it paints instantly (an opacity:0 → 1 ramp would
+   defer Largest Contentful Paint until the animation finishes). */
+@keyframes rise-up {
+  from {
+    transform: translateY(12px);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+.animate-rise {
+  animation: rise-up 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
 /* Terminal cursor blink (DevView) */
 @keyframes blink {
   0%,
@@ -165,6 +186,69 @@ body {
 
 .cursor-blink {
   animation: blink 1.1s step-end infinite;
+}
+
+/* Tech Explorer (React island): orbiting React atom + chip entrance */
+@keyframes tech-orbit {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes tech-chip-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.96);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Pause the whole orbital system while interacting with it.
+   !important is required to override the inline `animation` shorthand. */
+.orbit-system:hover .orbit-anim,
+.orbit-system:focus-within .orbit-anim {
+  animation-play-state: paused !important;
+}
+
+/* Central React core gentle pulse. */
+@keyframes core-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 22px -8px rgba(97, 218, 251, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 34px -4px rgba(97, 218, 251, 0.85);
+  }
+}
+.core-pulse {
+  animation: core-pulse 3.2s ease-in-out infinite;
+}
+
+/* Vue-colored variant for the Experience (Vue) island. */
+@keyframes core-pulse-vue {
+  0%,
+  100% {
+    box-shadow: 0 0 22px -8px rgba(66, 184, 131, 0.55);
+  }
+  50% {
+    box-shadow: 0 0 34px -4px rgba(66, 184, 131, 0.9);
+  }
+}
+.core-pulse-vue {
+  animation: core-pulse-vue 3.2s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [style*="tech-orbit"],
+  [style*="tech-chip-in"],
+  .orbit-anim,
+  .core-pulse,
+  .core-pulse-vue {
+    animation: none !important;
+  }
 }
 
 /* ---------------------------------------------------------------------------

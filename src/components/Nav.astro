@@ -1,15 +1,20 @@
 ---
-import { profile } from "../data/portfolio";
+import { getPortfolio } from "../data/portfolio";
+import { getUi, localizedPath, LANGUAGES, DEFAULT_LANG } from "../data/i18n.js";
+
+const { lang = DEFAULT_LANG } = Astro.props;
+const { profile } = getPortfolio(lang);
+const t = getUi(lang).nav;
 
 const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
-const isDev = pathname.startsWith("/dev");
+const isDev = pathname.startsWith("/dev") || pathname.startsWith("/es/dev");
 
 const standardLinks = [
-  { label: "About", href: "#about" },
-  { label: "Stack", href: "#stack" },
-  { label: "Projects", href: "#projects" },
-  { label: "Experience", href: "#experience" },
-  { label: "Contact", href: "#contact" },
+  { label: t.about, href: "#about" },
+  { label: t.stack, href: "#stack" },
+  { label: t.projects, href: "#projects" },
+  { label: t.experience, href: "#experience" },
+  { label: t.contact, href: "#contact" },
 ];
 
 // In dev mode the code editor provides its own file tabs, so the nav links
@@ -22,6 +27,8 @@ const initials = profile.name
   .join("")
   .slice(0, 2)
   .toUpperCase();
+
+const brandHref = isDev ? localizedPath(lang, "/") : "#main";
 ---
 
 <header
@@ -29,20 +36,21 @@ const initials = profile.name
 >
   <nav class="mx-auto flex h-16 max-w-5xl items-center justify-between px-4 sm:px-6">
     <a
-      href={isDev ? "/" : "#main"}
-      class="flex items-center gap-2 font-semibold text-text"
+      id="nav-brand"
+      href={brandHref}
+      data-show={isDev ? "true" : "false"}
+      class="nav-brand flex items-center gap-2 font-semibold text-text"
     >
       <span
-        class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-accent text-sm font-bold text-accent-contrast"
+        class="nav-brand-logo inline-flex h-8 w-8 items-center justify-center rounded-lg bg-accent-strong text-sm font-bold text-accent-contrast"
         >{initials}</span
       >
-      <span class="hidden sm:inline">{profile.name}</span>
+      <span class="nav-brand-name hidden sm:inline">{profile.name}</span>
     </a>
 
-    {
-      links.length > 0 && (
-        <>
-          {/* Desktop links */}
+    <div class="flex items-center gap-2">
+      {
+        links.length > 0 && (
           <ul class="hidden items-center gap-1 md:flex">
             {links.map((l) => (
               <li>
@@ -55,14 +63,48 @@ const initials = profile.name
               </li>
             ))}
           </ul>
+        )
+      }
 
-          {/* Mobile toggle */}
+      {/* Language switcher */}
+      {
+        !isDev && (
+          <div
+            class="flex items-center rounded-lg border border-border bg-surface/60 p-0.5 dark:border-2 dark:border-white/25 dark:bg-white/5"
+            role="group"
+            aria-label={t.switchLanguage}
+          >
+            {LANGUAGES.map((l) => (
+              <a
+                href={localizedPath(l.code, "/")}
+                hreflang={l.code}
+                data-lang-switch={l.code}
+                data-base={localizedPath(l.code, "/")}
+                aria-current={l.code === lang ? "true" : undefined}
+                class:list={[
+                  "rounded-md px-2.5 py-1 text-xs font-semibold transition",
+                  l.code === lang
+                    ? "bg-accent-strong text-accent-contrast"
+                    : "text-muted hover:bg-hover hover:text-text",
+                ]}
+              >
+                {l.label}
+              </a>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        links.length > 0 && (
           <button
             id="nav-toggle"
             type="button"
-            aria-label="Open menu"
+            aria-label={t.openMenu}
             aria-controls="nav-mobile"
             aria-expanded="false"
+            data-open-label={t.openMenu}
+            data-close-label={t.closeMenu}
             class="inline-flex h-10 w-10 items-center justify-center rounded-lg text-text transition hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent md:hidden"
           >
             <svg class="nav-icon-open h-6 w-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
@@ -72,9 +114,9 @@ const initials = profile.name
               <path d="M18 6 6 18M6 6l12 12" />
             </svg>
           </button>
-        </>
-      )
-    }
+        )
+      }
+    </div>
   </nav>
 
   {/* Mobile menu panel */}
@@ -108,13 +150,15 @@ const initials = profile.name
   if (toggle && panel) {
     const openIcon = toggle.querySelector(".nav-icon-open");
     const closeIcon = toggle.querySelector(".nav-icon-close");
+    const openLabel = toggle.dataset.openLabel || "Open menu";
+    const closeLabel = toggle.dataset.closeLabel || "Close menu";
 
     const setOpen = (open) => {
       panel.classList.toggle("hidden", !open);
       openIcon?.classList.toggle("hidden", open);
       closeIcon?.classList.toggle("hidden", !open);
       toggle.setAttribute("aria-expanded", open ? "true" : "false");
-      toggle.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+      toggle.setAttribute("aria-label", open ? closeLabel : openLabel);
     };
 
     toggle.addEventListener("click", () =>
@@ -134,4 +178,99 @@ const initials = profile.name
       if (e.matches) setOpen(false);
     });
   }
+
+  // The header brand stands in for the hero avatar: it appears only once the
+  // hero avatar scrolls out of view, so exactly one of them is visible at a time.
+  const brand = document.getElementById("nav-brand");
+  const heroAvatar = document.getElementById("hero-avatar");
+  if (brand && heroAvatar && "IntersectionObserver" in window) {
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        brand.dataset.show = entry.isIntersecting ? "false" : "true";
+      },
+      // Discount the sticky header (64px) so the avatar counts as "gone" the
+      // moment it tucks behind the bar, not when it leaves the page entirely.
+      { rootMargin: "-64px 0px 0px 0px", threshold: 0 },
+    );
+    io.observe(heroAvatar);
+  } else if (brand && !heroAvatar) {
+    // No hero avatar on this page — keep the brand visible.
+    brand.dataset.show = "true";
+  }
+
+  // Keep the current section (hash) when switching language, and remember the
+  // chosen locale for next time.
+  const switches = document.querySelectorAll("[data-lang-switch]");
+  const syncHash = () => {
+    switches.forEach((a) => {
+      a.setAttribute("href", (a.dataset.base || "/") + (location.hash || ""));
+    });
+  };
+  if (switches.length) {
+    syncHash();
+    window.addEventListener("hashchange", syncHash);
+    switches.forEach((a) =>
+      a.addEventListener("click", () => {
+        try {
+          localStorage.setItem("lang", a.dataset.langSwitch);
+        } catch (e) {
+          /* ignore */
+        }
+      }),
+    );
+  }
 </script>
+
+<style>
+  /* Brand reveal — a smooth, staggered slide-in driven by [data-show]. */
+  .nav-brand {
+    transition:
+      opacity 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      transform 0.45s cubic-bezier(0.16, 1, 0.3, 1),
+      filter 0.45s ease;
+    will-change: opacity, transform, filter;
+  }
+  .nav-brand[data-show="false"] {
+    opacity: 0;
+    transform: translateX(-0.6rem) scale(0.94);
+    filter: blur(1.5px);
+    pointer-events: none;
+  }
+  .nav-brand[data-show="true"] {
+    opacity: 1;
+    transform: none;
+    filter: none;
+  }
+
+  /* The logo leads; the name follows a beat later for a refined cascade. */
+  .nav-brand-logo,
+  .nav-brand-name {
+    transition:
+      opacity 0.4s ease,
+      transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .nav-brand[data-show="false"] .nav-brand-logo {
+    opacity: 0;
+    transform: translateX(-0.35rem);
+  }
+  .nav-brand[data-show="false"] .nav-brand-name {
+    opacity: 0;
+    transform: translateX(-0.6rem);
+  }
+  .nav-brand[data-show="true"] .nav-brand-logo {
+    transition-delay: 0.04s;
+  }
+  .nav-brand[data-show="true"] .nav-brand-name {
+    transition-delay: 0.12s;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .nav-brand,
+    .nav-brand-logo,
+    .nav-brand-name {
+      transition: none;
+      filter: none;
+      transform: none;
+    }
+  }
+</style>

@@ -1,26 +1,64 @@
 ---
-import { profile } from "../data/portfolio";
+import { getPortfolio } from "../data/portfolio";
+import { getUi, DEFAULT_LANG } from "../data/i18n.js";
+import LighthouseBadge from "./LighthouseBadge.astro";
+import {
+  siAstro,
+  siReact,
+  siVuedotjs,
+  siTailwindcss,
+} from "simple-icons";
+
+const { lang = DEFAULT_LANG } = Astro.props;
+const { profile } = getPortfolio(lang);
+const t = getUi(lang).footer;
 
 const year = new Date().getFullYear();
+
+// The actual stack this site is built with — shown as brand logos.
+const builtWith = [
+  { name: "Astro", href: "https://astro.build", icon: siAstro },
+  { name: "React", href: "https://react.dev", icon: siReact },
+  { name: "Vue", href: "https://vuejs.org", icon: siVuedotjs },
+  { name: "Tailwind CSS", href: "https://tailwindcss.com", icon: siTailwindcss },
+];
 ---
 
 <footer class="border-t border-border">
+  <div class="mx-auto max-w-5xl px-4 pt-8 sm:px-6">
+    <LighthouseBadge lang={lang} />
+  </div>
   <div
-    class="mx-auto flex max-w-5xl flex-col items-center justify-between gap-2 px-4 py-8 text-sm text-muted sm:flex-row sm:px-6"
+    class="mx-auto mt-2 flex max-w-5xl flex-col items-center justify-between gap-3 border-t border-border/60 px-4 py-8 text-sm text-muted sm:flex-row sm:px-6"
   >
-    <p>&copy; {year} {profile.name}. All rights reserved.</p>
-    <p class="font-mono">
-      Built with <a
-        href="https://astro.build"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-accent hover:underline">Astro</a
-      > &amp; <a
-        href="https://tailwindcss.com"
-        target="_blank"
-        rel="noopener noreferrer"
-        class="text-accent hover:underline">Tailwind</a
-      >
-    </p>
+    <p>&copy; {year} {profile.name}. {t.rights}</p>
+    <div class="flex items-center gap-2.5 font-mono">
+      <span>{t.builtWith}</span>
+      <ul class="flex items-center gap-2.5">
+        {
+          builtWith.map((tech) => (
+            <li>
+              <a
+                href={tech.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={tech.name}
+                aria-label={tech.name}
+                class="group inline-flex items-center"
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  class="h-[1.15rem] w-[1.15rem] opacity-80 transition group-hover:-translate-y-0.5 group-hover:opacity-100"
+                  style={`fill: #${tech.icon.hex}`}
+                  aria-hidden="true"
+                >
+                  <path d={tech.icon.path} />
+                </svg>
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
   </div>
 </footer>

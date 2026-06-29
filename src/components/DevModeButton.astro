@@ -2,14 +2,20 @@
 // Floating devMode toggle. ON (DevView) = green, OFF (standard) = default.
 // Navigates between routes and reflects the current view as its on/off state.
 // Stacks just above the Theme Studio launcher in the bottom-right corner.
+// Locale-aware: keeps the current language (/dev <-> /es/dev).
+import { getUi, localizedPath, DEFAULT_LANG } from "../data/i18n.js";
+
+const { lang = DEFAULT_LANG } = Astro.props;
+const t = getUi(lang).dev;
+
 const pathname = Astro.url.pathname.replace(/\/$/, "") || "/";
-const isDev = pathname.startsWith("/dev");
-const target = isDev ? "/" : "/dev";
+const isDev = pathname === "/dev" || pathname.startsWith("/es/dev");
+const target = localizedPath(lang, isDev ? "/" : "/dev");
 ---
 
 <a
     href={target}
-    aria-label={isDev ? "Switch to standard view" : "Switch to developer view"}
+    aria-label={isDev ? t.switchToStandard : t.switchToDev}
     title={isDev
         ? "devMode: ON - switch to standard view"
         : "devMode: OFF - switch to DevView"}

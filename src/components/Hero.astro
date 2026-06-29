@@ -1,6 +1,11 @@
 ---
-import { profile, techStack, experience } from "../data/portfolio";
+import { getPortfolio } from "../data/portfolio";
+import { getUi, DEFAULT_LANG } from "../data/i18n.js";
 import SocialLinks from "./SocialLinks.astro";
+
+const { lang = DEFAULT_LANG } = Astro.props;
+const { profile, techStack, experience } = getPortfolio(lang);
+const t = getUi(lang).hero;
 
 const initials = profile.name
   .split(" ")
@@ -13,9 +18,9 @@ const initials = profile.name
 const years = new Date().getFullYear() - 2014;
 const techCount = techStack.reduce((n, c) => n + c.items.length, 0);
 const stats = [
-  { value: `${years}+`, label: "Years experience" },
-  { value: `${experience.length}`, label: "Roles & promotions" },
-  { value: `${techCount}+`, label: "Technologies" },
+  { value: `${years}+`, label: t.stats.years },
+  { value: `${experience.length}`, label: t.stats.roles },
+  { value: `${techCount}+`, label: t.stats.technologies },
 ];
 ---
 
@@ -35,10 +40,10 @@ const stats = [
   </div>
 
   <div class="mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-28">
-    <div class="flex flex-col items-start gap-10 md:flex-row md:items-center md:gap-14">
+    <div class="flex flex-col items-start gap-10 md:flex-row md:items-center md:gap-10">
       <!-- Avatar -->
-      <div class="flex animate-fade-up flex-col items-start gap-4 md:items-center">
-        <div class="group relative">
+      <div class="flex animate-rise flex-col items-start gap-4 md:shrink-0 md:items-center">
+        <div id="hero-avatar" class="group relative">
           <div
             class="absolute -inset-1.5 -z-10 rounded-[1.75rem] bg-gradient-to-br from-accent to-transparent opacity-70 blur-md transition group-hover:opacity-100"
           >
@@ -57,8 +62,9 @@ const stats = [
             )
           }
         </div>
+
         <p
-          class="inline-flex items-center gap-2 rounded-full border border-border bg-surface/70 px-3 py-1 text-sm font-medium text-muted backdrop-blur"
+          class="inline-flex items-center gap-2 whitespace-nowrap rounded-full border border-border bg-surface/70 px-5 py-1.5 text-sm font-medium text-muted backdrop-blur"
         >
           <span class="relative flex h-2 w-2">
             <span
@@ -66,20 +72,20 @@ const stats = [
             ></span>
             <span class="relative inline-flex h-2 w-2 rounded-full bg-green-500"></span>
           </span>
-          Available for work
+          {t.available}
         </p>
       </div>
 
       <!-- Intro -->
-      <div class="min-w-0">
+      <div class="min-w-0 md:flex-1">
         <h1
-          class="hero-name animate-fade-up text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
+          class="hero-name animate-rise text-5xl font-extrabold leading-[1.05] tracking-tight sm:text-6xl lg:text-7xl"
         >
           {profile.name}
         </h1>
 
         <p
-          class="mt-4 flex animate-fade-up flex-wrap items-center gap-x-2 font-mono text-lg font-semibold text-text sm:text-xl"
+          class="mt-4 flex animate-rise flex-wrap items-center gap-x-2 font-mono text-lg font-semibold text-text sm:text-xl"
           style="animation-delay:60ms"
         >
           <span class="text-accent" aria-hidden="true">&gt;</span>
@@ -92,7 +98,7 @@ const stats = [
         {
           profile.badges && profile.badges.length > 0 && (
             <ul
-              class="mt-5 flex animate-fade-up flex-wrap gap-2"
+              class="mt-5 flex animate-rise flex-wrap gap-2"
               style="animation-delay:120ms"
             >
               {profile.badges.map((badge) => (
@@ -106,7 +112,7 @@ const stats = [
         }
 
         <p
-          class="mt-6 max-w-xl animate-fade-up text-lg leading-relaxed text-muted"
+          class="mt-6 max-w-xl animate-rise text-lg leading-relaxed text-muted"
           style="animation-delay:180ms"
         >
           {profile.tagline}
@@ -114,7 +120,7 @@ const stats = [
 
         <!-- Stats -->
         <dl
-          class="mt-8 flex animate-fade-up flex-wrap gap-x-10 gap-y-4"
+          class="mt-8 flex animate-rise flex-wrap gap-x-10 gap-y-4"
           style="animation-delay:240ms"
         >
           {
@@ -132,14 +138,14 @@ const stats = [
         </dl>
 
         <div
-          class="mt-9 flex animate-fade-up flex-wrap items-center gap-3"
+          class="mt-9 flex animate-rise flex-wrap items-center gap-3"
           style="animation-delay:300ms"
         >
           <a
             href="#projects"
-            class="group inline-flex items-center gap-2 rounded-xl bg-accent px-6 py-3 text-sm font-semibold text-accent-contrast shadow-lg shadow-accent/25 transition hover:-translate-y-0.5 hover:shadow-accent/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
+            class="group inline-flex items-center gap-2 rounded-xl bg-accent-strong px-6 py-3 text-sm font-semibold text-accent-contrast shadow-lg shadow-accent/25 transition hover:-translate-y-0.5 hover:shadow-accent/40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            View my work
+            {t.viewWork}
             <svg class="h-4 w-4 transition group-hover:translate-x-0.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M5 12h14" />
               <path d="m12 5 7 7-7 7" />
@@ -149,7 +155,7 @@ const stats = [
             href="#contact"
             class="inline-flex items-center gap-2 rounded-xl border border-border bg-surface/40 px-6 py-3 text-sm font-semibold text-text backdrop-blur transition hover:-translate-y-0.5 hover:border-accent hover:bg-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent"
           >
-            Get in touch
+            {t.getInTouch}
           </a>
           {
             profile.resumeUrl && (
@@ -159,13 +165,13 @@ const stats = [
                 rel="noopener noreferrer"
                 class="inline-flex items-center gap-2 px-2 py-3 text-sm font-semibold text-muted underline-offset-4 transition hover:text-accent hover:underline"
               >
-                Resume
+                {t.resume}
               </a>
             )
           }
         </div>
 
-        <SocialLinks class="mt-8" />
+        <SocialLinks class="mt-8" emailAsForm />
       </div>
     </div>
   </div>

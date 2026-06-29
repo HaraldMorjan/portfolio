@@ -3,6 +3,21 @@ import { ref, computed } from "vue";
 
 const props = defineProps({
   experience: { type: Array, default: () => [] },
+  lang: { type: String, default: "en" },
+  strings: {
+    type: Object,
+    default: () => ({
+      all: "All",
+      filterPromptTpl: "Filter {total} roles by a skill above, or tap any skill on a role.",
+      showingTpl: "Showing {shown} of {total} roles using {skill}",
+      present: "Present",
+      yr: "yr",
+      yrs: "yrs",
+      mo: "mo",
+      mos: "mos",
+      builtWith: "Built with Vue",
+    }),
+  },
 });
 
 const activeSkill = ref(null);
@@ -26,6 +41,16 @@ const filtered = computed(() =>
     : props.experience,
 );
 
+const filterPrompt = computed(() =>
+  props.strings.filterPromptTpl.replace("{total}", props.experience.length),
+);
+const showingText = computed(() =>
+  props.strings.showingTpl
+    .replace("{shown}", filtered.value.length)
+    .replace("{total}", props.experience.length)
+    .replace("{skill}", activeSkill.value || ""),
+);
+
 function toggleSkill(skill) {
   activeSkill.value = activeSkill.value === skill ? null : skill;
 }
@@ -37,9 +62,12 @@ function splitHighlight(text) {
   return { label: "", rest: text };
 }
 
+// Accept both English and Spanish month abbreviations so periods stay
+// parseable regardless of the locale the data is written in.
 const MONTHS = {
   jan: 0, feb: 1, mar: 2, apr: 3, may: 4, jun: 5,
   jul: 6, aug: 7, sep: 8, oct: 9, nov: 10, dec: 11,
+  ene: 0, abr: 3, ago: 7, dic: 11,
 };
 function parseMonthYear(s) {
   const parts = s.trim().split(/\s+/);
@@ -54,7 +82,7 @@ function durationOf(period) {
   const start = parseMonthYear(startStr || "");
   if (!start) return "";
   const now = new Date();
-  const end = /present/i.test(endStr || "")
+  const end = /present|presente/i.test(endStr || "")
     ? { y: now.getFullYear(), m: now.getMonth() }
     : parseMonthYear(endStr || "");
   if (!end) return "";
@@ -62,29 +90,31 @@ function durationOf(period) {
   if (months < 1) months = 1;
   const yrs = Math.floor(months / 12);
   const mos = months % 12;
+  const s = props.strings;
   const out = [];
-  if (yrs) out.push(`${yrs} yr${yrs > 1 ? "s" : ""}`);
-  if (mos) out.push(`${mos} mo${mos > 1 ? "s" : ""}`);
-  return out.join(" ") || "1 mo";
+  if (yrs) out.push(`${yrs} ${yrs > 1 ? s.yrs : s.yr}`);
+  if (mos) out.push(`${mos} ${mos > 1 ? s.mos : s.mo}`);
+  return out.join(" ") || `1 ${s.mo}`;
 }
 </script>
 
 <template>
   <div>
-    <!-- Filter bar -->
-    <div class="mt-6">
-      <div class="flex flex-wrap items-center gap-2">
+    <!-- Filter bar (left) + glowing Vue logo (right) -->
+    <div class="mt-6 flex items-start justify-between gap-4">
+      <div class="min-w-0 flex-1">
+        <div class="flex flex-wrap items-center gap-2">
         <button
           type="button"
           class="rounded-md border px-2.5 py-1 font-mono text-xs transition"
           :class="
             activeSkill === null
-              ? 'border-accent bg-accent text-accent-contrast'
+              ? 'border-accent-strong bg-accent-strong text-accent-contrast'
               : 'border-border bg-surface text-muted hover:border-accent hover:text-text'
           "
           @click="activeSkill = null"
         >
-          All
+          {{ strings.all }}
         </button>
         <button
           v-for="skill in filterSkills"
@@ -93,7 +123,7 @@ function durationOf(period) {
           class="rounded-md border px-2.5 py-1 font-mono text-xs transition"
           :class="
             activeSkill === skill
-              ? 'border-accent bg-accent text-accent-contrast'
+              ? 'border-accent-strong bg-accent-strong text-accent-contrast'
               : 'border-border bg-surface text-muted hover:border-accent hover:text-text'
           "
           @click="toggleSkill(skill)"
@@ -101,17 +131,31 @@ function durationOf(period) {
           {{ skill }}
         </button>
       </div>
-      <p class="mt-3 text-sm text-muted" aria-live="polite">
-        <template v-if="activeSkill">
-          Showing
-          <span class="font-semibold text-text">{{ filtered.length }}</span>
-          of {{ experience.length }} roles using
-          <span class="font-medium text-accent">{{ activeSkill }}</span>
-        </template>
-        <template v-else>
-          Filter {{ experience.length }} roles by a skill above, or tap any skill on a role.
-        </template>
-      </p>
+        <p class="mt-3 text-sm text-muted" aria-live="polite">
+          <template v-if="activeSkill">{{ showingText }}</template>
+          <template v-else>{{ filterPrompt }}</template>
+        </p>
+      </div>
+
+      <!-- Glowing Vue logo — the Vue signal (mirrors the React atom) -->
+      <span
+        role="img"
+        class="core-pulse-vue inline-flex h-16 w-16 shrink-0 items-center justify-center rounded-full border border-border bg-bg"
+        style="box-shadow: 0 0 22px -4px rgba(66, 184, 131, 0.8)"
+        :aria-label="strings.builtWith"
+        :title="strings.builtWith"
+      >
+        <svg class="h-9 w-9" viewBox="0 0 24 24" aria-hidden="true">
+          <path
+            fill="#41B883"
+            d="M24 1.61h-9.94L12 5.16 9.94 1.61H0l12 20.78L24 1.61Z"
+          />
+          <path
+            fill="#35495E"
+            d="M12 14.08 5.16 2.27h4.43L12 6.41l2.41-4.14h4.43L12 14.08Z"
+          />
+        </svg>
+      </span>
     </div>
 
     <!-- Timeline -->
@@ -130,7 +174,7 @@ function durationOf(period) {
         </h3>
         <p class="mt-1 font-mono text-sm text-muted">
           {{ item.period }}
-          <span v-if="durationOf(item.period)" class="text-muted/70">
+          <span v-if="durationOf(item.period)" class="text-muted">
             · {{ durationOf(item.period) }}</span
           >
         </p>

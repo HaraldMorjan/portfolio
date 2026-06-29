@@ -1,7 +1,9 @@
 ---
 import { Code } from "astro:components";
 import { marked } from "marked";
-import { profile, socials, techStack, projects } from "../../data/portfolio";
+import { getPortfolio } from "../../data/portfolio";
+import { getUi, DEFAULT_LANG } from "../../data/i18n.js";
+import { lighthouse, reportUrl } from "../../data/lighthouse.js";
 import SocialLinks from "../SocialLinks.astro";
 import StackContent from "../sections/StackContent.astro";
 import ExperienceContent from "../sections/ExperienceContent.astro";
@@ -14,7 +16,12 @@ const viewMap = {
   projects: ProjectsContent,
 };
 
-const { files } = Astro.props;
+const { files, lang = DEFAULT_LANG } = Astro.props;
+const { profile, socials, techStack, projects } = getPortfolio(lang);
+const t = getUi(lang).dev;
+const c = getUi(lang).contact;
+const resumeUrl = profile.resumeUrl || "";
+const calendarUrl = profile.calendarUrl || "";
 
 // Pre-render Markdown files so the "markdown" tabs show formatted output.
 marked.setOptions({ gfm: true, breaks: false });
@@ -40,6 +47,21 @@ const initials = profile.name
   .slice(0, 2)
   .toUpperCase();
 
+// GitHub username (for the live `github` terminal command), parsed from socials.
+const githubUrl = (socials.find((s) => /github\.com/i.test(s.href)) || {}).href || "";
+const githubUser = githubUrl.replace(/\/+$/, "").split("/").pop() || "";
+
+// Accent presets the `theme` command can switch to (mirrors Theme Studio).
+const themePresets = {
+  default: "",
+  ocean: "#0ea5e9",
+  sunset: "#f97316",
+  forest: "#16a34a",
+  grape: "#8b5cf6",
+  rose: "#e11d48",
+  mono: "#64748b",
+};
+
 // Data exposed to the interactive terminal (client-side).
 const terminalData = {
   profile: {
@@ -52,6 +74,15 @@ const terminalData = {
   techStack,
   projects: projects.map((p) => ({ title: p.title, tags: p.tags })),
   files: files.map((f) => ({ filename: f.filename, id: f.id })),
+  github: githubUser,
+  themes: themePresets,
+  lighthouse: {
+    scores: lighthouse.scores,
+    measuredAt: lighthouse.measuredAt,
+    formFactor: lighthouse.formFactor,
+    report: reportUrl(),
+  },
+  i18n: t,
 };
 ---
 
@@ -65,7 +96,45 @@ const terminalData = {
       <span class="h-3 w-3 rounded-full bg-yellow-400"></span>
       <span class="h-3 w-3 rounded-full bg-green-400"></span>
     </span>
-    <span class="ml-2 font-mono text-xs text-muted">{profile.name} — portfolio</span>
+    <span class="ml-2 truncate font-mono text-xs text-muted">{profile.name} — {t.windowTitle}</span>
+
+    <!-- Résumé + booking actions -->
+    <div class="ml-auto flex shrink-0 items-center gap-2">
+      <a
+        href={resumeUrl || undefined}
+        download={resumeUrl ? true : undefined}
+        aria-disabled={resumeUrl ? undefined : "true"}
+        title={resumeUrl ? c.resume : c.soon}
+        class:list={[
+          "inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 font-mono text-[0.7rem] text-muted transition",
+          resumeUrl ? "hover:border-accent hover:text-text" : "cursor-not-allowed opacity-60",
+        ]}
+      >
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+          <path d="M7 10l5 5 5-5" />
+          <path d="M12 15V3" />
+        </svg>
+        <span class="hidden sm:inline">{c.resume}</span>
+      </a>
+      <a
+        href={calendarUrl || undefined}
+        target={calendarUrl ? "_blank" : undefined}
+        rel={calendarUrl ? "noopener noreferrer" : undefined}
+        aria-disabled={calendarUrl ? undefined : "true"}
+        title={calendarUrl ? c.book : c.soon}
+        class:list={[
+          "inline-flex items-center gap-1.5 rounded-md border border-border px-2.5 py-1 font-mono text-[0.7rem] text-muted transition",
+          calendarUrl ? "hover:border-accent hover:text-text" : "cursor-not-allowed opacity-60",
+        ]}
+      >
+        <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="3" y="4" width="18" height="18" rx="2" />
+          <path d="M16 2v4M8 2v4M3 10h18" />
+        </svg>
+        <span class="hidden sm:inline">{c.book}</span>
+      </a>
+    </div>
   </div>
 
   <!-- Body: sidebar + main -->
@@ -79,92 +148,60 @@ const terminalData = {
     >
       <!-- Profile -->
       <div class="order-1 border-b border-border bg-bg/40 p-4 md:order-none md:border-0 md:bg-transparent">
-        <div class="flex items-center gap-3">
+        <div class="flex items-start gap-3">
           {
             profile.avatar ? (
               <img
                 src={profile.avatar}
                 alt={profile.name}
-                class="h-12 w-12 rounded-lg object-cover"
+                class="h-16 w-16 shrink-0 rounded-lg object-cover"
               />
             ) : (
-              <div class="flex h-12 w-12 items-center justify-center rounded-lg bg-accent text-base font-bold text-accent-contrast">
+              <div class="flex h-16 w-16 shrink-0 items-center justify-center rounded-lg bg-accent text-xl font-bold text-accent-contrast">
                 {initials}
               </div>
             )
           }
-          <div class="min-w-0">
-            <p class="truncate font-semibold text-text">{profile.name}</p>
-            <p class="truncate font-mono text-xs text-accent">{profile.role}</p>
+          <div class="min-w-0 pt-0.5">
+            <p class="font-semibold leading-snug text-text">{profile.name}</p>
+            <p class="mt-1 font-mono text-xs leading-snug text-accent">{profile.role}</p>
           </div>
         </div>
-        <p class="mt-3 inline-flex items-center gap-1.5 font-mono text-xs text-muted">
-          <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
-            <circle cx="12" cy="10" r="3"></circle>
-          </svg>
-          {profile.location}
-        </p>
+        <!-- Availability chip -->
+        <div class="mt-4">
+          <span class="inline-flex items-center gap-1.5 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-1 font-mono text-[0.7rem] font-medium text-emerald-600 dark:text-emerald-400">
+            <span class="relative flex h-2 w-2" aria-hidden="true">
+              <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+            </span>
+            {t.available}
+          </span>
+        </div>
+
+        <div class="mt-3 flex items-center justify-between gap-2 font-mono text-xs text-muted">
+          <span class="inline-flex min-w-0 items-center gap-1.5">
+            <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+              <circle cx="12" cy="10" r="3"></circle>
+            </svg>
+            <span class="truncate">{profile.location}</span>
+          </span>
+          <span class="inline-flex shrink-0 items-center gap-1.5" title={c.localTime}>
+            <svg class="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <path d="M12 6v6l4 2"></path>
+            </svg>
+            <span class="sr-only">{c.localTime}:</span>
+            <span id="dev-local-time" data-tz="America/Guatemala" data-locale={lang}>--:--</span>
+          </span>
+        </div>
+
         <p class="mt-3 text-sm leading-relaxed text-muted">{profile.bio}</p>
       </div>
 
-      <!-- Terminal: an OS-style terminal window. On mobile it's a collapsible
-           panel (collapsed by default); on desktop it always fills the sidebar.
-           A plain div + button is used instead of <details> so the flex chain
-           (md:flex-1) reaches the terminal reliably across browsers. -->
-      <div class="term-details order-3 flex min-h-0 flex-col border-t border-border p-4 md:order-none md:flex-1 is-collapsed">
-        <button
-          type="button"
-          aria-expanded="false"
-          aria-controls="term-window"
-          class="term-toggle mb-3 flex w-full cursor-pointer items-center justify-between gap-2 rounded-lg border border-border bg-bg px-3 py-2 font-mono text-xs text-muted transition hover:text-text"
-        >
-          <span class="flex items-center gap-1.5">
-            <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 17 6-6-6-6" /><path d="M12 19h8" /></svg>
-            Open terminal
-          </span>
-          <svg viewBox="0 0 24 24" class="term-chevron h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 9 6 6 6-6" /></svg>
-        </button>
-        <div id="term-window" class="term-content flex h-72 min-h-0 flex-col overflow-hidden rounded-xl border border-black/50 shadow-xl ring-1 ring-white/5 md:h-auto md:flex-1">
-          <!-- Window title bar -->
-          <div class="relative flex shrink-0 items-center border-b border-black/40 bg-gradient-to-b from-[#272d39] to-[#1c212b] px-3 py-2">
-            <span class="flex gap-1.5" aria-hidden="true">
-              <span class="h-3 w-3 rounded-full bg-[#ff5f57] ring-1 ring-black/20"></span>
-              <span class="h-3 w-3 rounded-full bg-[#febc2e] ring-1 ring-black/20"></span>
-              <span class="h-3 w-3 rounded-full bg-[#28c840] ring-1 ring-black/20"></span>
-            </span>
-            <span class="pointer-events-none absolute inset-x-0 flex items-center justify-center gap-1.5 text-center font-mono text-[0.7rem] font-medium text-slate-400">
-              <svg viewBox="0 0 24 24" class="h-3 w-3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 17 6-6-6-6" /><path d="M12 19h8" /></svg>
-              zsh — portfolio
-            </span>
-          </div>
-          <!-- Terminal body (interactive) -->
-          <div class="term-body flex-1 cursor-text overflow-auto bg-[#0b0f17] p-3.5 font-mono text-xs leading-[1.65] text-slate-200 [scrollbar-color:theme(colors.slate.700)_transparent] [scrollbar-width:thin] selection:bg-emerald-500/30 selection:text-emerald-50">
-            <div id="term-out" class="space-y-1"></div>
-            <div class="mt-0.5 flex flex-wrap items-center">
-              <span class="shrink-0 font-medium text-emerald-400">visitor@portfolio</span><span class="text-slate-500">:</span><span class="text-sky-400">~</span><span class="mr-1.5 text-slate-500">$</span>
-              <span id="term-typed" class="whitespace-pre-wrap break-all text-slate-100"></span><span
-                id="term-cursor"
-                class="cursor-blink inline-block h-3.5 w-[7px] translate-y-0.5 rounded-[1px] bg-emerald-400 align-middle"
-              ></span>
-              <input
-                id="term-input"
-                class="h-0 w-0 border-0 bg-transparent p-0 opacity-0"
-                autocomplete="off"
-                autocapitalize="off"
-                autocorrect="off"
-                spellcheck="false"
-                aria-label="Terminal input"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-      <script type="application/json" id="term-data" is:inline set:html={JSON.stringify(terminalData)} />
-
       <!-- Socials footer -->
-      <div class="order-4 shrink-0 border-t border-border bg-bg/40 p-4 md:order-none md:bg-transparent">
-        <SocialLinks />
+      <div class="order-4 shrink-0 border-t border-border bg-bg/40 p-4 md:order-none md:mt-auto md:bg-transparent">
+        <SocialLinks emailAsForm emailAccent />
       </div>
     </aside>
 
@@ -219,7 +256,7 @@ const terminalData = {
                 )}
                 {SectionView && (
                   <div class="px-6 py-7 sm:px-8">
-                    <SectionView />
+                    <SectionView lang={lang} />
                   </div>
                 )}
               </div>
@@ -228,156 +265,312 @@ const terminalData = {
         }
       </div>
 
+      <!-- Integrated terminal — sits at the bottom of the editor area only
+           (the sidebar stays full-height beside it), VS Code style. Collapsed
+           by default; toggle via the header bar or Ctrl+`. -->
+      <div
+        class="term-details is-collapsed flex shrink-0 flex-col border-t border-border bg-[#0b0f17]"
+        style="--term-h: 16rem;"
+      >
+    <!-- Drag handle to resize (desktop) -->
+    <div
+      class="term-resizer hidden h-1 w-full shrink-0 cursor-row-resize bg-border transition-colors hover:bg-accent md:block"
+      role="separator"
+      aria-orientation="horizontal"
+      aria-label="Resize terminal"
+    >
+    </div>
+
+    <!-- Panel header — click anywhere (or Ctrl+`) to toggle the terminal. -->
+    <div
+      class="term-header flex shrink-0 cursor-pointer select-none items-center gap-2 border-b border-black/40 bg-gradient-to-b from-[#272d39] to-[#1c212b] px-3 py-1.5"
+      title={t.openTerminal}
+    >
+      <span class="flex gap-1.5" aria-hidden="true">
+        <span class="h-3 w-3 rounded-full bg-[#ff5f57] ring-1 ring-black/20"></span>
+        <span class="h-3 w-3 rounded-full bg-[#febc2e] ring-1 ring-black/20"></span>
+        <span class="h-3 w-3 rounded-full bg-[#28c840] ring-1 ring-black/20"></span>
+      </span>
+      <span class="ml-1.5 inline-flex items-center gap-1.5 border-b-2 border-emerald-400 pb-1.5 pt-1 font-mono text-[0.7rem] font-semibold uppercase tracking-wider text-slate-200">
+        <svg viewBox="0 0 24 24" class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m4 17 6-6-6-6" /><path d="M12 19h8" /></svg>
+        Terminal
+      </span>
+      <span class="hidden font-mono text-[0.7rem] text-slate-500 sm:inline">{t.terminalTab}</span>
+
+      <div class="ml-auto flex items-center gap-2">
+        <kbd class="hidden rounded border border-white/10 bg-black/30 px-1.5 py-0.5 font-mono text-[0.65rem] text-slate-400 sm:inline-block">
+          Ctrl + `
+        </kbd>
+
+        <!-- Actions (only shown when the panel is open). -->
+        <div class="term-actions flex items-center gap-0.5">
+          <button
+            type="button"
+            data-term-clear
+            title={t.termClear}
+            aria-label={t.termClear}
+            class="inline-flex h-7 w-7 items-center justify-center rounded text-slate-400 transition hover:bg-white/10 hover:text-slate-100"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6h18" /><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6" /></svg>
+          </button>
+          <button
+            type="button"
+            data-term-max
+            title={t.termMax}
+            aria-label={t.termMax}
+            class="hidden h-7 w-7 items-center justify-center rounded text-slate-400 transition hover:bg-white/10 hover:text-slate-100 md:inline-flex"
+          >
+            <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3M21 8V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3M16 21h3a2 2 0 0 0 2-2v-3" /></svg>
+          </button>
+        </div>
+
+        <!-- Expand / collapse chevron. -->
+        <button
+          type="button"
+          class="term-toggle inline-flex h-7 w-7 items-center justify-center rounded text-slate-400 transition hover:bg-white/10 hover:text-slate-100"
+          aria-expanded="false"
+          aria-controls="term-window"
+          aria-label={t.openTerminal}
+        >
+          <svg viewBox="0 0 24 24" class="term-chevron h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m18 15-6-6-6 6" /></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Body wrapper (collapses on mobile) -->
+    <div id="term-window" class="term-content flex min-h-0 flex-1 flex-col">
+      <div class="term-body min-h-[14rem] max-h-[60vh] cursor-text overflow-auto p-3.5 font-mono text-[0.8rem] leading-[1.7] text-slate-200 [scrollbar-color:theme(colors.slate.700)_transparent] [scrollbar-width:thin] selection:bg-emerald-500/30 selection:text-emerald-50 md:min-h-0 md:max-h-none md:flex-1">
+        <div id="term-out" class="space-y-1"></div>
+        <div class="mt-0.5 flex flex-wrap items-center">
+          <span class="shrink-0 font-medium text-emerald-400">visitor@portfolio</span><span class="text-slate-500">:</span><span class="text-sky-400">~</span><span class="mr-1.5 text-slate-500">$</span>
+          <span id="term-typed" class="whitespace-pre-wrap break-all text-slate-100"></span><span
+            id="term-cursor"
+            class="cursor-blink inline-block h-3.5 w-[7px] translate-y-0.5 rounded-[1px] bg-emerald-400 align-middle"
+          ></span>
+          <input
+            id="term-input"
+            class="h-0 w-0 border-0 bg-transparent p-0 opacity-0"
+            autocomplete="off"
+            autocapitalize="off"
+            autocorrect="off"
+            spellcheck="false"
+            aria-label="Terminal input"
+          />
+        </div>
+      </div>
+    </div>
+      </div>
     </div>
   </div>
+  <script type="application/json" id="term-data" is:inline set:html={JSON.stringify(terminalData)} />
 
   <!-- Status bar -->
-  <div class="flex shrink-0 items-center justify-between gap-4 bg-accent px-4 py-1 font-mono text-[0.7rem] text-accent-contrast">
-    <span class="flex items-center gap-1.5">
-      <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-        <circle cx="6" cy="6" r="2.5"></circle>
-        <circle cx="18" cy="18" r="2.5"></circle>
-        <path d="M6 8.5v3a4 4 0 0 0 4 4h5.5"></path>
-      </svg>
-      main
-    </span>
-    <span class="flex items-center gap-4">
-      <span class="ce-status-lang">{langName[files[0]?.lang] ?? ""}</span>
-      <span class="hidden sm:inline">UTF-8</span>
-      <span class="hidden sm:inline">Ln 1, Col 1</span>
-    </span>
-  </div>
-</div>
-
-<!-- Contact form modal (opened by the `contactme` terminal command) -->
-<div id="contact-modal" class="fixed inset-0 z-50 hidden items-center justify-center p-4">
-  <div id="contact-backdrop" class="absolute inset-0 bg-black/60 backdrop-blur-sm"></div>
-  <div
-    role="dialog"
-    aria-modal="true"
-    aria-labelledby="contact-title"
-    class="relative w-full max-w-md overflow-hidden rounded-xl border border-border bg-surface shadow-2xl"
-  >
-    <!-- Window title bar -->
-    <div class="flex items-center gap-2 border-b border-border px-4 py-2.5">
-      <span class="flex gap-1.5">
-        <button
-          id="contact-close"
-          type="button"
-          aria-label="Close contact form"
-          class="h-3 w-3 rounded-full bg-red-400 transition hover:brightness-110"></button>
-        <span class="h-3 w-3 rounded-full bg-yellow-400" aria-hidden="true"></span>
-        <span class="h-3 w-3 rounded-full bg-green-400" aria-hidden="true"></span>
+  <div class="flex shrink-0 items-center justify-between gap-4 bg-accent-strong px-2 py-1 font-mono text-[0.7rem] text-accent-contrast">
+    <div class="flex items-center gap-1">
+      <span class="flex items-center gap-1.5 px-2">
+        <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="6" cy="6" r="2.5"></circle>
+          <circle cx="18" cy="18" r="2.5"></circle>
+          <path d="M6 8.5v3a4 4 0 0 0 4 4h5.5"></path>
+        </svg>
+        main
       </span>
-      <span id="contact-title" class="mx-auto font-mono text-xs text-muted">contact — new message</span>
+      <button
+        id="contact-status-btn"
+        type="button"
+        data-contact-open
+        class="inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-medium transition hover:bg-black/20 focus-visible:outline-none"
+      >
+        <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <rect x="2" y="4" width="20" height="16" rx="2" />
+          <path d="m22 7-10 5L2 7" />
+        </svg>
+        {t.contactCta}
+      </button>
+      <button
+        id="cmdk-status-btn"
+        type="button"
+        title={t.palette.open}
+        aria-label={t.palette.open}
+        class="inline-flex items-center gap-1.5 rounded px-2 py-0.5 font-medium transition hover:bg-black/20 focus-visible:outline-none"
+      >
+        <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8" />
+          <path d="m21 21-4.3-4.3" />
+        </svg>
+        <span id="cmdk-key">Ctrl K</span>
+      </button>
     </div>
-
-    <form id="contact-form" class="space-y-4 p-5" novalidate>
-      <div>
-        <label for="contact-name" class="mb-1 block font-mono text-xs text-muted">name</label>
-        <input
-          id="contact-name"
-          name="name"
-          type="text"
-          required
-          placeholder="Your name"
-          class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text outline-none transition placeholder:text-muted/60 focus:border-accent focus:ring-2 focus:ring-accent/30"
-        />
-      </div>
-      <div>
-        <label for="contact-email" class="mb-1 block font-mono text-xs text-muted">email</label>
-        <input
-          id="contact-email"
-          name="email"
-          type="email"
-          required
-          placeholder="you@example.com"
-          class="w-full rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text outline-none transition placeholder:text-muted/60 focus:border-accent focus:ring-2 focus:ring-accent/30"
-        />
-      </div>
-      <div>
-        <label for="contact-message" class="mb-1 block font-mono text-xs text-muted">message</label>
-        <textarea
-          id="contact-message"
-          name="message"
-          rows="4"
-          required
-          placeholder="Hi Harald, …"
-          class="w-full resize-y rounded-lg border border-border bg-bg px-3 py-2 text-sm text-text outline-none transition placeholder:text-muted/60 focus:border-accent focus:ring-2 focus:ring-accent/30"
-        ></textarea>
-      </div>
-      <p id="contact-error" class="hidden text-xs text-red-400"></p>
-      <div class="flex items-center justify-end gap-2 pt-1">
-        <button
-          id="contact-cancel"
-          type="button"
-          class="rounded-lg border border-border px-4 py-2 text-sm text-muted transition hover:text-text"
-        >
-          Cancel
-        </button>
-        <button
-          type="submit"
-          class="inline-flex items-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-contrast transition hover:opacity-90"
-        >
-          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-            <path d="m22 2-7 20-4-9-9-4Z" />
-            <path d="M22 2 11 13" />
-          </svg>
-          Send
-        </button>
-      </div>
-    </form>
+    <span class="flex items-center gap-3 px-2 sm:gap-4">
+      <span class="ce-status-lang">{langName[files[0]?.lang] ?? ""}</span>
+      <span class="hidden md:inline">Spaces: 2</span>
+      <span class="hidden lg:inline">UTF-8</span>
+      <span class="hidden lg:inline">LF</span>
+      <span id="ce-lncol" class="tabular-nums">Ln 1, Col 1</span>
+      <span id="ce-clock" class="hidden tabular-nums sm:inline">--:--:--</span>
+    </span>
   </div>
 </div>
 
 <style>
-  /* Collapsed state (mobile default) hides the terminal window. */
+  /* Collapsed (default): only the slim header bar shows — like VS Code's
+     integrated terminal when closed. Open it via the header / Ctrl+`. */
   .term-details.is-collapsed > .term-content {
+    display: none;
+  }
+  .term-details.is-collapsed .term-resizer,
+  .term-details.is-collapsed .term-actions {
     display: none;
   }
   .term-chevron {
     transition: transform 0.2s ease;
   }
+  /* Open: chevron points down (click to close); closed: up (click to open). */
   .term-toggle[aria-expanded="true"] .term-chevron {
     transform: rotate(180deg);
   }
-  /* On desktop the terminal always fills the sidebar and the toggle is hidden,
-     regardless of the collapsed class. */
+  /* While dragging the resize handle, suppress text selection. */
+  .term-details.is-resizing,
+  .term-details.is-resizing * {
+    user-select: none;
+    cursor: row-resize;
+  }
+  /* When open on desktop, the panel takes a fixed (resizable) height. */
   @media (min-width: 768px) {
-    .term-toggle {
-      display: none !important;
-    }
-    .term-details > .term-content {
-      display: flex !important;
+    .term-details:not(.is-collapsed) {
+      height: var(--term-h, 16rem);
     }
   }
 </style>
 
 <script>
   // @ts-nocheck
+  // Live local time under the profile location.
+  const devTimeEl = document.getElementById("dev-local-time");
+  if (devTimeEl) {
+    const tz = devTimeEl.dataset.tz || "America/Guatemala";
+    const locale = devTimeEl.dataset.locale || "en";
+    const tickTime = () => {
+      try {
+        const parts = new Intl.DateTimeFormat(locale, {
+          hour: "2-digit",
+          minute: "2-digit",
+          timeZone: tz,
+          timeZoneName: "short",
+        }).formatToParts(new Date());
+        const get = (type) => parts.find((p) => p.type === type)?.value || "";
+        const time = `${get("hour")}:${get("minute")}${get("dayPeriod") ? " " + get("dayPeriod") : ""}`;
+        const zone = get("timeZoneName");
+        devTimeEl.textContent = zone ? `${time} (${zone})` : time;
+      } catch (e) {
+        /* Intl/timezone unsupported */
+      }
+    };
+    tickTime();
+    setInterval(tickTime, 30000);
+  }
+
+  // Live status-bar clock.
+  const clockEl = document.getElementById("ce-clock");
+  if (clockEl) {
+    const tick = () =>
+      (clockEl.textContent = new Date().toLocaleTimeString([], { hour12: false }));
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  // Command-palette launcher in the status bar + platform-aware key label.
+  const cmdkKey = document.getElementById("cmdk-key");
+  if (cmdkKey && /mac|iphone|ipad/i.test(navigator.platform || navigator.userAgent)) {
+    cmdkKey.textContent = "\u2318K";
+  }
+  document
+    .getElementById("cmdk-status-btn")
+    ?.addEventListener("click", () =>
+      window.dispatchEvent(new CustomEvent("palette:open")),
+    );
+
   const editor = document.querySelector(".code-editor");
   if (editor) {
     const panes = Array.from(editor.querySelectorAll(".ce-pane"));
     const tabs = Array.from(editor.querySelectorAll(".ce-tab"));
     const files = Array.from(editor.querySelectorAll(".ce-file"));
     const statusLang = editor.querySelector(".ce-status-lang");
+    const lnColEl = editor.querySelector("#ce-lncol");
 
-    // The terminal collapses on mobile and is always expanded on desktop.
+    // Integrated terminal: collapsed by default, just like VS Code. Open it by
+    // clicking the header bar or with the Ctrl+` / Ctrl+ñ shortcut.
     const termDetails = editor.querySelector(".term-details");
+    const termHeader = editor.querySelector(".term-header");
     const termToggle = editor.querySelector(".term-toggle");
-    if (termDetails && termToggle) {
-      const desktopMq = window.matchMedia("(min-width: 768px)");
-      const setCollapsed = (collapsed) => {
-        termDetails.classList.toggle("is-collapsed", collapsed);
-        termToggle.setAttribute("aria-expanded", collapsed ? "false" : "true");
+    const termInputEl = editor.querySelector("#term-input");
+    const TERM_KEY = "devterm";
+    const setTermCollapsed = (collapsed, persist = true) => {
+      if (!termDetails) return;
+      termDetails.classList.toggle("is-collapsed", collapsed);
+      termToggle?.setAttribute("aria-expanded", collapsed ? "false" : "true");
+      if (persist) {
+        try {
+          localStorage.setItem(TERM_KEY, collapsed ? "closed" : "open");
+        } catch (e) {
+          /* storage disabled */
+        }
+      }
+      if (!collapsed) requestAnimationFrame(() => termInputEl?.focus());
+    };
+    const toggleTerm = () =>
+      setTermCollapsed(!termDetails?.classList.contains("is-collapsed"));
+
+    if (termDetails && termHeader) {
+      termHeader.addEventListener("click", toggleTerm);
+      // Restore the last state (default stays collapsed).
+      try {
+        if (localStorage.getItem(TERM_KEY) === "open") setTermCollapsed(false, false);
+      } catch (e) {
+        /* storage disabled */
+      }
+      // VS Code-style toggle: Ctrl+` (and Ctrl+ñ on Spanish layouts).
+      window.addEventListener("keydown", (e) => {
+        const k = e.key;
+        if (
+          e.ctrlKey &&
+          (k === "`" || k === "ñ" || k === "Ñ" || e.code === "Backquote")
+        ) {
+          e.preventDefault();
+          toggleTerm();
+        }
+      });
+    }
+
+    // Drag-to-resize the terminal panel height (desktop). Updates the --term-h
+    // custom property the panel reads in its media query.
+    const resizer = editor.querySelector(".term-resizer");
+    if (resizer && termDetails) {
+      let startY = 0;
+      let startH = 0;
+      let dragging = false;
+      const onMove = (ev) => {
+        if (!dragging) return;
+        const h = startH + (startY - ev.clientY);
+        const clamped = Math.max(140, Math.min(window.innerHeight * 0.75, h));
+        termDetails.style.setProperty("--term-h", clamped + "px");
+        termDetails.classList.remove("is-max");
       };
-      // Expanded on desktop, collapsed on mobile; re-sync on breakpoint change.
-      const syncTerminal = () => setCollapsed(!desktopMq.matches);
-      syncTerminal();
-      desktopMq.addEventListener("change", syncTerminal);
-      termToggle.addEventListener("click", () =>
-        setCollapsed(!termDetails.classList.contains("is-collapsed")),
-      );
+      const onUp = () => {
+        dragging = false;
+        termDetails.classList.remove("is-resizing");
+        window.removeEventListener("pointermove", onMove);
+        window.removeEventListener("pointerup", onUp);
+      };
+      resizer.addEventListener("pointerdown", (ev) => {
+        dragging = true;
+        startY = ev.clientY;
+        startH = termDetails.getBoundingClientRect().height;
+        termDetails.classList.add("is-resizing");
+        window.addEventListener("pointermove", onMove);
+        window.addEventListener("pointerup", onUp);
+        ev.preventDefault();
+      });
     }
 
     const setActive = (els, id) =>
@@ -393,6 +586,7 @@ const terminalData = {
       );
       const pane = panes.find((p) => p.id === id);
       if (statusLang && pane) statusLang.textContent = pane.dataset.langname || "";
+      if (lnColEl) lnColEl.textContent = "Ln 1, Col 1";
       if (scroll) editor.scrollIntoView({ behavior: "smooth", block: "start" });
     }
 
@@ -405,10 +599,44 @@ const terminalData = {
     const initial = location.hash.slice(1);
     if (initial) activate(initial);
 
+    // The command palette drives tab switching through this event.
+    window.addEventListener("devtab:open", (e) => {
+      const id = e.detail && e.detail.id;
+      if (id) activate(id, true);
+    });
+
+    // Live "Ln X, Col Y" derived from the caret position inside the active
+    // pane — a real editor touch rather than a static placeholder.
+    if (lnColEl) {
+      const updateLnCol = () => {
+        const sel = window.getSelection();
+        if (!sel || sel.rangeCount === 0 || !sel.focusNode) return;
+        const pane = panes.find((p) => !p.classList.contains("hidden"));
+        if (!pane || !pane.contains(sel.focusNode)) return;
+        const scope = pane.querySelector("pre") || pane;
+        try {
+          const range = document.createRange();
+          range.setStart(scope, 0);
+          range.setEnd(sel.focusNode, sel.focusOffset);
+          const lines = range.toString().split("\n");
+          const ln = lines.length;
+          const col = lines[lines.length - 1].length + 1;
+          lnColEl.textContent = `Ln ${ln}, Col ${col}`;
+        } catch (err) {
+          /* selection spans an unsupported boundary */
+        }
+      };
+      document.addEventListener("selectionchange", updateLnCol);
+    }
+
     // ---- interactive terminal ---------------------------------------------
     const termData = JSON.parse(
       document.getElementById("term-data")?.textContent || "{}",
     );
+    const T = termData.i18n || {};
+    const TH = T.help || {};
+    const fmt = (str, map) =>
+      (str || "").replace(/\{(\w+)\}/g, (_, k) => (k in map ? map[k] : `{${k}}`));
     const out = editor.querySelector("#term-out");
     const input = editor.querySelector("#term-input");
     const typed = editor.querySelector("#term-typed");
@@ -420,6 +648,26 @@ const terminalData = {
       const history = [];
       let histIdx = 0;
       const CONTACT_EMAIL = "harald.morjan@gmail.com";
+      const START = Date.now();
+      const GH_USER = termData.github || "";
+      const THEMES = termData.themes || {};
+
+      // Apply an accent color live by overriding the CSS design tokens.
+      const applyAccent = (color) => {
+        const root = document.documentElement;
+        if (!color) {
+          root.style.removeProperty("--accent");
+          root.style.removeProperty("--accent-contrast");
+          return;
+        }
+        root.style.setProperty("--accent", color);
+        const hex = color.replace("#", "");
+        const r = parseInt(hex.slice(0, 2), 16);
+        const g = parseInt(hex.slice(2, 4), 16);
+        const b = parseInt(hex.slice(4, 6), 16);
+        const lum = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        root.style.setProperty("--accent-contrast", lum > 0.6 ? "#0b0f17" : "#ffffff");
+      };
 
       const esc = (s) =>
         s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -445,6 +693,27 @@ const terminalData = {
       const findFile = (name) =>
         tFiles.find((f) => f.filename.toLowerCase() === (name || "").toLowerCase());
 
+      // Bare commands that simply open the matching editor tab instead of
+      // printing into the terminal (e.g. `projects` -> projects.md tab).
+      const TAB_FOR = {
+        about: "about-ts",
+        stack: "stack-md",
+        skills: "stack-md",
+        experience: "experience-md",
+        projects: "projects-md",
+        readme: "readme-md",
+      };
+      const openTab = (id) => {
+        activate(id);
+        const f = tFiles.find((ff) => ff.id === id);
+        const parts2 = (T.openingFile || "Opening {file} in the editor…").split("{file}");
+        printHtml(
+          `<span class="text-slate-400">${hh(parts2[0] || "")}</span>` +
+            `<span class="text-sky-400">${hh(f ? f.filename : id)}</span>` +
+            `<span class="text-slate-400">${hh(parts2[1] || "")}</span>`,
+        );
+      };
+
       const hh = esc;
       const grid = (rows) =>
         `<div class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5">${rows}</div>`;
@@ -469,23 +738,28 @@ const terminalData = {
         );
 
       const helpRows = [
-        ["help", "show this help"],
-        ["whoami", "name and role"],
-        ["about", "short bio"],
-        ["skills", "tech stack"],
-        ["projects", "list projects"],
-        ["socials", "contact links"],
-        ["ls", "list files"],
-        ["cat &lt;file&gt;", "print a file"],
-        ["open &lt;file&gt;", "open a file"],
-        ["open &lt;social&gt;", "open a link"],
-        ["contactme", "open a contact form"],
-        ["clear", "clear screen"],
+        ["help", TH.help],
+        ["whoami", TH.whoami],
+        ["about", TH.about],
+        ["stack", TH.stack],
+        ["experience", TH.experience],
+        ["projects", TH.projects],
+        ["socials", TH.socials],
+        ["ls", TH.ls],
+        ["cat &lt;file&gt;", TH.cat],
+        ["open &lt;file&gt;", TH.openFile],
+        ["open &lt;social&gt;", TH.openLink],
+        ["contactme", TH.contactme],
+        ["theme &lt;name&gt;", TH.theme],
+        ["neofetch", TH.neofetch],
+        ["github", TH.github],
+        ["lighthouse", TH.lighthouse],
+        ["clear", TH.clear],
       ];
 
       const commands = {
         help: () =>
-          `<div class="mb-1 text-slate-500"># available commands</div>` +
+          `<div class="mb-1 text-slate-500">${hh(T.helpHeader || "# available commands")}</div>` +
           grid(
             helpRows
               .map(
@@ -515,8 +789,8 @@ const terminalData = {
         socials: socialsList,
         contact: socialsList,
         contactme: () => {
-          openContact();
-          return `<span class="text-slate-400">Opening contact form… </span><span class="text-slate-500">(or just email </span><span class="text-sky-400">${CONTACT_EMAIL}</span><span class="text-slate-500">)</span>`;
+          window.dispatchEvent(new CustomEvent("contact:open"));
+          return `<span class="text-slate-400">${hh(T.contactOpening || "Opening contact form… ")}</span><span class="text-slate-500">${hh(T.contactOpeningHint || "(or just email ")}</span><span class="text-sky-400">${CONTACT_EMAIL}</span><span class="text-slate-500">)</span>`;
         },
         hireme: () => commands.contactme(),
         ls: () =>
@@ -524,11 +798,154 @@ const terminalData = {
             .map((f) => `<span class="text-sky-400">${hh(f.filename)}</span>`)
             .join('<span class="text-slate-600">  </span>'),
         date: () => `<span class="text-slate-400">${hh(new Date().toString())}</span>`,
+        pwd: () => `<span class="text-slate-400">/home/visitor/portfolio</span>`,
+        history: () =>
+          history.length
+            ? history
+                .map(
+                  (h, i) =>
+                    `<div><span class="mr-3 text-slate-600">${i + 1}</span><span class="text-slate-300">${hh(h)}</span></div>`,
+                )
+                .join("")
+            : `<span class="text-slate-500">(empty)</span>`,
+        neofetch: () => {
+          const secs = Math.floor((Date.now() - START) / 1000);
+          const upt = secs < 60 ? `${secs}s` : `${Math.floor(secs / 60)}m ${secs % 60}s`;
+          const stackCount = (termData.techStack || []).reduce(
+            (n, c) => n + (c.items ? c.items.length : 0),
+            0,
+          );
+          const info = [
+            [termData.profile.name, ""],
+            ["OS", "PortfolioOS (web)"],
+            ["Host", location.hostname || "localhost"],
+            ["Role", termData.profile.role],
+            ["Location", termData.profile.location],
+            ["Shell", "zsh"],
+            ["Stack", `${stackCount} technologies`],
+            ["Projects", `${(termData.projects || []).length} repos`],
+            ["Theme", document.documentElement.classList.contains("dark") ? "dark" : "light"],
+            ["Resolution", `${window.innerWidth}x${window.innerHeight}`],
+            ["Uptime", upt],
+          ];
+          const rows = info
+            .map(([k, v]) =>
+              v
+                ? `<span class="text-emerald-400">${hh(k)}</span><span class="text-slate-300">${hh(v)}</span>`
+                : `<span class="font-semibold text-slate-100">${hh(k)}</span><span class="text-slate-600">${"─".repeat(Math.max(4, k.length))}</span>`,
+            )
+            .join("");
+          const ascii = `<pre class="leading-tight text-emerald-400">${[
+            "    ___ ",
+            "  _/ _ \\_   ",
+            " / |&lt;/&gt;| \\  ",
+            " \\_\\___/_/  ",
+            "    dev     ",
+          ].join("\n")}</pre>`;
+          return `<div class="flex flex-wrap items-center gap-x-6 gap-y-2">${ascii}<div class="grid grid-cols-[auto_1fr] gap-x-4 gap-y-0.5">${rows}</div></div>`;
+        },
         clear: () => {
           out.innerHTML = "";
           return "";
         },
       };
+
+      // Live GitHub stats via the public REST API. Cached in sessionStorage so
+      // repeated calls in one visit don't burn through the rate limit.
+      const bar = (value, max, width = 14) => {
+        const filled = max > 0 ? Math.round((value / max) * width) : 0;
+        return "█".repeat(filled) + "░".repeat(Math.max(0, width - filled));
+      };
+      async function githubStats() {
+        if (!GH_USER) {
+          printText("github: no username configured.", "text-red-400");
+          return;
+        }
+        const loading = document.createElement("div");
+        loading.className = "text-slate-400";
+        loading.textContent = T.ghFetching || "Fetching live data from GitHub…";
+        out.appendChild(loading);
+        scrollDown();
+        try {
+          let payload = null;
+          const cached = sessionStorage.getItem("gh:" + GH_USER);
+          if (cached) payload = JSON.parse(cached);
+          if (!payload) {
+            const [uRes, rRes] = await Promise.all([
+              fetch(`https://api.github.com/users/${GH_USER}`),
+              fetch(`https://api.github.com/users/${GH_USER}/repos?per_page=100&sort=updated`),
+            ]);
+            if (!uRes.ok || !rRes.ok) throw new Error("api");
+            const user = await uRes.json();
+            const repos = await rRes.json();
+            payload = { user, repos };
+            try {
+              sessionStorage.setItem("gh:" + GH_USER, JSON.stringify(payload));
+            } catch (e) {
+              /* storage full / disabled */
+            }
+          }
+          const { user, repos } = payload;
+          loading.remove();
+          const stars = repos.reduce((n, r) => n + (r.stargazers_count || 0), 0);
+          const forks = repos.reduce((n, r) => n + (r.forks_count || 0), 0);
+          const langCount = {};
+          repos.forEach((r) => {
+            if (r.language) langCount[r.language] = (langCount[r.language] || 0) + 1;
+          });
+          const langs = Object.entries(langCount).sort((a, b) => b[1] - a[1]).slice(0, 5);
+          const maxLang = langs.length ? langs[0][1] : 0;
+          const topRepos = [...repos]
+            .sort((a, b) => (b.stargazers_count || 0) - (a.stargazers_count || 0))
+            .slice(0, 5);
+
+          const head =
+            `<div class="flex items-center gap-2"><span class="font-semibold text-slate-100">@${hh(user.login)}</span>` +
+            `<span class="text-slate-500">·</span><span class="text-slate-400">${hh(user.name || "")}</span></div>`;
+          const stats = grid(
+            [
+              ["public repos", user.public_repos],
+              ["followers", user.followers],
+              ["following", user.following],
+              ["★ stars", stars],
+              ["⑂ forks", forks],
+            ]
+              .map(
+                ([k, v]) =>
+                  `<span class="text-emerald-400">${hh(k)}</span><span class="text-slate-100">${hh(String(v))}</span>`,
+              )
+              .join(""),
+          );
+          const langBlock = langs.length
+            ? `<div class="mt-2 text-slate-500">// top languages</div>` +
+              grid(
+                langs
+                  .map(
+                    ([name, n]) =>
+                      `<span class="text-sky-400">${hh(name)}</span><span class="text-slate-500">${bar(n, maxLang)} ${n}</span>`,
+                  )
+                  .join(""),
+              )
+            : "";
+          const repoBlock = topRepos.length
+            ? `<div class="mt-2 text-slate-500">// top repos</div>` +
+              topRepos
+                .map(
+                  (r) =>
+                    `<div class="mt-0.5 pl-4 -indent-4"><span class="text-emerald-400">▸</span> ` +
+                    `<a href="${hh(r.html_url)}" target="_blank" rel="noopener" class="text-slate-100 underline-offset-2 hover:underline">${hh(r.name)}</a> ` +
+                    `<span class="text-slate-500">★${r.stargazers_count || 0}${r.language ? " · " + hh(r.language) : ""}</span></div>`,
+                )
+                .join("")
+            : "";
+          printHtml(head + `<div class="mt-1">${stats}</div>` + langBlock + repoBlock);
+          scrollDown();
+        } catch (err) {
+          loading.remove();
+          printText(T.ghError || "Couldn't reach the GitHub API.", "text-red-400");
+          scrollDown();
+        }
+      }
 
       function run(raw) {
         echo(raw);
@@ -542,17 +959,26 @@ const terminalData = {
 
         if (cmd === "cat") {
           const f = findFile(arg);
-          if (!f) printText(`cat: ${arg}: No such file`, "text-red-400");
+          if (!f)
+            printText(
+              fmt(T.noSuchFile || "cat: {arg}: No such file", { arg }),
+              "text-red-400",
+            );
           else {
             const el = document.getElementById(f.id);
             printText((el?.textContent || "").trim(), "text-slate-300");
+            // Also surface the file in the editor above, not just the terminal.
+            activate(f.id);
           }
         } else if (cmd === "open" || cmd === "code") {
           const f = findFile(arg);
           if (f) {
             activate(f.id);
+            const parts2 = (T.openingFile || "Opening {file} in the editor…").split(
+              "{file}",
+            );
             printHtml(
-              `<span class="text-slate-400">Opening </span><span class="text-sky-400">${hh(f.filename)}</span><span class="text-slate-400"> in the editor…</span>`,
+              `<span class="text-slate-400">${hh(parts2[0] || "")}</span><span class="text-sky-400">${hh(f.filename)}</span><span class="text-slate-400">${hh(parts2[1] || "")}</span>`,
             );
           } else {
             const a = arg.toLowerCase();
@@ -561,85 +987,230 @@ const terminalData = {
             );
             if (social && a) {
               window.open(social.href, "_blank", "noopener");
-              printText(`Opening ${social.label}…`, "text-slate-400");
+              printText(
+                fmt(T.openingLink || "Opening {label}…", { label: social.label }),
+                "text-slate-400",
+              );
             } else {
-              printText(`open: ${arg}: not found`, "text-red-400");
+              printText(
+                fmt(T.openNotFound || "open: {arg}: not found", { arg }),
+                "text-red-400",
+              );
             }
           }
         } else if (cmd === "sudo") {
           printText(
-            "visitor is not in the sudoers file. This incident will be reported.",
+            T.sudo ||
+              "visitor is not in the sudoers file. This incident will be reported.",
             "text-red-400",
           );
+        } else if (cmd === "echo") {
+          printText(parts.slice(1).join(" "), "text-slate-300");
+        } else if (cmd === "theme") {
+          const names = Object.keys(THEMES);
+          if (!arg) {
+            printHtml(
+              `<span class="text-slate-400">${hh(T.themeUsage || "usage: theme <name|#hex> — available:")}</span> ` +
+                names
+                  .map((n) => `<span class="text-sky-400">${hh(n)}</span>`)
+                  .join('<span class="text-slate-600">  </span>'),
+            );
+          } else {
+            let color = null;
+            let label = arg.toLowerCase();
+            if (/^#?[0-9a-f]{6}$/i.test(arg)) {
+              color = arg.startsWith("#") ? arg : "#" + arg;
+              label = color;
+            } else if (label in THEMES) {
+              color = THEMES[label];
+            }
+            if (color === null) {
+              printText(
+                fmt(T.notFound || "command not found: {cmd}. Type 'help'.", { cmd: arg }),
+                "text-red-400",
+              );
+            } else {
+              applyAccent(color);
+              printHtml(
+                `<span class="text-emerald-400">✓</span> <span class="text-slate-400">${hh(
+                  fmt(T.themeApplied || "Accent updated to {name}.", { name: label }),
+                )}</span>`,
+              );
+            }
+          }
+        } else if (cmd === "github" || cmd === "gh") {
+          githubStats();
+        } else if (cmd === "lighthouse" || cmd === "lh") {
+          const lh = termData.lighthouse || { scores: {} };
+          const s = lh.scores || {};
+          const rows = [
+            ["Performance", s.performance],
+            ["Accessibility", s.accessibility],
+            ["Best Practices", s.bestPractices],
+            ["SEO", s.seo],
+          ];
+          const colorOf = (n) =>
+            n >= 90 ? "#0cce6b" : n >= 50 ? "#ffa400" : "#ff4e42";
+          const html = rows
+            .map(([label, n]) => {
+              const v = typeof n === "number" ? n : 0;
+              const filled = Math.round((v / 100) * 20);
+              const meter =
+                `<span style="color:${colorOf(v)}">${"█".repeat(filled)}</span>` +
+                `<span class="text-slate-700">${"░".repeat(20 - filled)}</span>`;
+              return (
+                `<span class="text-slate-300">${hh(label)}</span>` +
+                `<span>${meter} <span style="color:${colorOf(v)}" class="font-semibold">${v}</span></span>`
+              );
+            })
+            .join("");
+          const lhLink = lh.report
+            ? `<div class="mt-1.5 text-slate-500">→ <a href="${hh(lh.report)}" target="_blank" rel="noopener noreferrer" class="text-sky-400 underline-offset-2 hover:underline">${hh(T.lighthouseReport || "run a live audit on PageSpeed Insights")}</a></div>`
+            : "";
+          printHtml(
+            `<div class="mb-1 text-slate-500">// Lighthouse · ${hh(lh.formFactor || "")}${lh.formFactor ? " · " : ""}${hh(lh.measuredAt || "")}</div>` +
+              grid(html) +
+              lhLink,
+          );
+        } else if (TAB_FOR[cmd]) {
+          openTab(TAB_FOR[cmd]);
         } else if (commands[cmd]) {
           const res = commands[cmd]();
           if (res) printHtml(res);
         } else {
-          printText(`command not found: ${parts[0]}. Type 'help'.`, "text-red-400");
+          printText(
+            fmt(T.notFound || "command not found: {cmd}. Type 'help'.", {
+              cmd: parts[0],
+            }),
+            "text-red-400",
+          );
         }
       }
 
+      const welcomeParts = (T.welcome || "Welcome! Type {help} to get started.").split(
+        "{help}",
+      );
       printHtml(
-        `<span class="text-slate-400">Welcome! Type </span><span class="text-emerald-400">help</span><span class="text-slate-400"> to get started.</span>`,
+        `<span class="text-slate-400">${hh(welcomeParts[0] || "")}</span><span class="text-emerald-400">help</span><span class="text-slate-400">${hh(welcomeParts[1] || "")}</span>`,
+      );
+      const isMac = /mac|iphone|ipad/i.test(navigator.platform || navigator.userAgent);
+      const ckLabel = isMac ? "⌘K" : "Ctrl+K";
+      const hintParts = (T.hintTab || "Tip: press {tab} to autocomplete · {ck} for the command palette.").split(
+        /\{tab\}|\{ck\}/,
+      );
+      printHtml(
+        `<span class="text-slate-500">${hh(hintParts[0] || "")}</span>` +
+          `<span class="rounded bg-slate-700/60 px-1 text-slate-300">Tab</span>` +
+          `<span class="text-slate-500">${hh(hintParts[1] || "")}</span>` +
+          `<span class="rounded bg-slate-700/60 px-1 text-slate-300">${hh(ckLabel)}</span>` +
+          `<span class="text-slate-500">${hh(hintParts[2] || "")}</span>`,
       );
 
-      // ---- contact form modal -----------------------------------------------
-      const modal = document.getElementById("contact-modal");
-      const form = document.getElementById("contact-form");
-      const nameEl = document.getElementById("contact-name");
-      const emailEl = document.getElementById("contact-email");
-      const messageEl = document.getElementById("contact-message");
-      const errorEl = document.getElementById("contact-error");
+      // ---- Tab autocomplete -------------------------------------------------
+      const COMMAND_NAMES = [
+        ...Object.keys(commands),
+        "cat",
+        "open",
+        "code",
+        "sudo",
+        "echo",
+        "theme",
+        "github",
+        "gh",
+        "lighthouse",
+        "lh",
+        "experience",
+        "readme",
+      ];
+      const completeFrom = (frag, matches, prefix) => {
+        if (!matches.length) return null;
+        if (matches.length === 1) return prefix + matches[0];
+        const common = matches.reduce((a, b) => {
+          let i = 0;
+          while (i < a.length && i < b.length && a[i].toLowerCase() === b[i].toLowerCase()) i++;
+          return a.slice(0, i);
+        });
+        printHtml(
+          matches
+            .map((m) => `<span class="text-sky-400">${hh(m)}</span>`)
+            .join('<span class="text-slate-600">  </span>'),
+        );
+        scrollDown();
+        return common.length > frag.length ? prefix + common : null;
+      };
+      const autocomplete = (val) => {
+        const parts = val.split(/\s+/);
+        const trailingSpace = /\s$/.test(val);
+        if (parts.length <= 1 && !trailingSpace) {
+          const frag = parts[0] || "";
+          const matches = [...new Set(COMMAND_NAMES)]
+            .filter((c) => c.startsWith(frag.toLowerCase()))
+            .sort();
+          return completeFrom(frag, matches, "");
+        }
+        const cmd = parts[0].toLowerCase();
+        const frag = trailingSpace ? "" : parts[parts.length - 1];
+        let pool = [];
+        if (["cat", "open", "code"].includes(cmd)) {
+          pool = tFiles.map((f) => f.filename);
+          if (cmd === "open") pool = pool.concat(tSocials.map((s) => s.label));
+        } else if (cmd === "theme") {
+          pool = Object.keys(THEMES);
+        }
+        if (!pool.length) return null;
+        const matches = pool.filter((p) => p.toLowerCase().startsWith(frag.toLowerCase()));
+        const prefix = parts.slice(0, parts.length - (trailingSpace ? 0 : 1)).join(" ") + " ";
+        return completeFrom(frag, matches, prefix);
+      };
 
-      function openContact() {
-        if (!modal) return;
-        modal.classList.remove("hidden");
-        modal.classList.add("flex");
-        if (errorEl) errorEl.classList.add("hidden");
-        setTimeout(() => nameEl?.focus(), 30);
-      }
-      function closeContact() {
-        if (!modal) return;
-        modal.classList.add("hidden");
-        modal.classList.remove("flex");
-        input?.focus();
-      }
-
-      document.getElementById("contact-close")?.addEventListener("click", closeContact);
-      document.getElementById("contact-cancel")?.addEventListener("click", closeContact);
-      document.getElementById("contact-backdrop")?.addEventListener("click", closeContact);
-      document.addEventListener("keydown", (e) => {
-        if (e.key === "Escape" && modal && !modal.classList.contains("hidden")) closeContact();
+      // Command palette / external triggers can run terminal commands.
+      window.addEventListener("term:run", (e) => {
+        const cmd = (e.detail && e.detail.cmd) || "";
+        if (!cmd) return;
+        setTermCollapsed(false);
+        run(cmd);
+        scrollDown();
+        input.focus();
       });
 
-      form?.addEventListener("submit", (e) => {
-        e.preventDefault();
-        const name = (nameEl?.value || "").trim();
-        const email = (emailEl?.value || "").trim();
-        const message = (messageEl?.value || "").trim();
-
-        if (!name || !email || !message || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-          if (errorEl) {
-            errorEl.textContent = "Please fill in your name, a valid email, and a message.";
-            errorEl.classList.remove("hidden");
-          }
-          return;
-        }
-
-        const subject = `Portfolio contact from ${name}`;
-        const bodyText = `${message}\n\n— ${name} (${email})`;
-        const href = `mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(
-          subject,
-        )}&body=${encodeURIComponent(bodyText)}`;
-        window.location.href = href;
-
-        closeContact();
-        form.reset();
+      // The contact form modal itself lives in the shared <ContactModal>; the
+      // terminal triggers reuse it via data-contact-open / the "contact:open"
+      // event. When a message is sent, echo a confirmation into the terminal.
+      window.addEventListener("contact:sent", (e) => {
+        const mail = (e.detail && e.detail.email) || CONTACT_EMAIL;
         printHtml(
-          `<span class="text-emerald-400">✓</span> <span class="text-slate-400">Opening your email client to send the message to </span><span class="text-sky-400">${CONTACT_EMAIL}</span><span class="text-slate-400">…</span>`,
+          `<span class="text-emerald-400">✓</span> <span class="text-slate-400">${hh(T.contactSuccess || "Opening your email client to send the message to ")}</span><span class="text-sky-400">${hh(mail)}</span><span class="text-slate-400">…</span>`,
         );
         scrollDown();
       });
+
+      // Panel header actions: clear output, and maximize/restore the panel.
+      // stopPropagation keeps these from toggling the panel via the header.
+      editor.querySelector("[data-term-clear]")?.addEventListener("click", (e) => {
+        e.stopPropagation();
+        out.innerHTML = "";
+        input.focus();
+      });
+      const maxBtn = editor.querySelector("[data-term-max]");
+      if (maxBtn && termDetails) {
+        maxBtn.addEventListener("click", (e) => {
+          e.stopPropagation();
+          const maxed = termDetails.classList.toggle("is-max");
+          if (maxed) {
+            termDetails.dataset.prevH =
+              termDetails.style.getPropertyValue("--term-h") || "16rem";
+            termDetails.style.setProperty("--term-h", "75vh");
+            maxBtn.setAttribute("title", T.termRestore || "Restore panel");
+          } else {
+            termDetails.style.setProperty(
+              "--term-h",
+              termDetails.dataset.prevH || "16rem",
+            );
+            maxBtn.setAttribute("title", T.termMax || "Maximize panel");
+          }
+          input.focus();
+        });
+      }
 
       body.addEventListener("click", () => input.focus());
       input.addEventListener("input", () => (typed.textContent = input.value));
@@ -649,6 +1220,13 @@ const terminalData = {
           input.value = "";
           typed.textContent = "";
           scrollDown();
+        } else if (e.key === "Tab") {
+          e.preventDefault();
+          const completed = autocomplete(input.value);
+          if (completed != null) {
+            input.value = completed;
+            typed.textContent = completed;
+          }
         } else if (e.key === "ArrowUp") {
           if (history.length) {
             histIdx = Math.max(0, histIdx - 1);
