@@ -14,6 +14,7 @@ const target = localizedPath(lang, isDev ? "/" : "/dev");
 ---
 
 <a
+    id="dev-mode-toggle"
     href={target}
     aria-label={isDev ? t.switchToStandard : t.switchToDev}
     title={isDev
@@ -26,16 +27,22 @@ const target = localizedPath(lang, isDev ? "/" : "/dev");
             : "border border-border bg-surface text-muted hover:text-text",
     ]}
 >
+    <span
+        id="dev-mode-ping"
+        class="pointer-events-none absolute -inset-1 rounded-full bg-accent opacity-0"
+        aria-hidden="true"
+    ></span>
+
     <!-- Hover/focus label -->
     <span
-        class="pointer-events-none absolute right-14 whitespace-nowrap rounded-md bg-text px-2 py-1 text-xs font-medium text-bg opacity-0 shadow-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
+        class="dev-mode-hint-label pointer-events-none absolute right-14 whitespace-nowrap rounded-md bg-text px-2 py-1 text-xs font-medium text-bg opacity-0 shadow-md transition-opacity duration-200 group-hover:opacity-100 group-focus-visible:opacity-100"
     >
         devMode {isDev ? "ON" : "OFF"}
     </span>
 
     <!-- Code glyph -->
     <svg
-        class="h-5 w-5"
+        class="relative h-5 w-5"
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"
@@ -48,3 +55,68 @@ const target = localizedPath(lang, isDev ? "/" : "/dev");
         <path d="m15 8 4 4-4 4"></path>
     </svg>
 </a>
+
+<style>
+    #dev-mode-toggle.dev-mode-spotlight {
+        border-color: var(--accent);
+        color: var(--accent);
+        animation: dev-mode-spotlight 0.9s ease-in-out 3;
+    }
+
+    #dev-mode-toggle.dev-mode-spotlight .dev-mode-hint-label {
+        opacity: 1;
+    }
+
+    #dev-mode-toggle.dev-mode-spotlight #dev-mode-ping {
+        animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) 2;
+        opacity: 0.35;
+    }
+
+    @keyframes dev-mode-spotlight {
+        0%,
+        100% {
+            transform: scale(1);
+            box-shadow:
+                0 10px 15px -3px rgb(0 0 0 / 0.1),
+                0 0 0 0 color-mix(in srgb, var(--accent) 50%, transparent);
+        }
+        50% {
+            transform: scale(1.1);
+            box-shadow:
+                0 10px 15px -3px rgb(0 0 0 / 0.1),
+                0 0 0 12px transparent;
+        }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        #dev-mode-toggle.dev-mode-spotlight {
+            animation: none;
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 45%, transparent);
+        }
+
+        #dev-mode-toggle.dev-mode-spotlight #dev-mode-ping {
+            animation: none;
+            opacity: 0.25;
+        }
+    }
+</style>
+
+<script>
+    function spotlightDevMode() {
+        const btn = document.getElementById("dev-mode-toggle");
+        if (!btn || btn.classList.contains("dev-mode-spotlight")) return;
+
+        btn.classList.add("dev-mode-spotlight");
+        window.setTimeout(() => btn.classList.remove("dev-mode-spotlight"), 3200);
+    }
+
+    function bindHeroDevModeHint() {
+        const hint = document.getElementById("hero-dev-mode-hint");
+        if (!hint || hint.dataset.bound) return;
+        hint.dataset.bound = "true";
+        hint.addEventListener("click", spotlightDevMode);
+    }
+
+    bindHeroDevModeHint();
+    document.addEventListener("astro:page-load", bindHeroDevModeHint);
+</script>

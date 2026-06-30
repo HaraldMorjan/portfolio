@@ -38,6 +38,8 @@ export const ui = {
         roles: "Roles & promotions",
         technologies: "Technologies",
       },
+      devModeBefore: "Want to see something different,",
+      tryDevMode: "try dev mode",
     },
     about: {
       eyebrow: "About",
@@ -302,6 +304,8 @@ export const ui = {
         roles: "Roles y ascensos",
         technologies: "Tecnologías",
       },
+      devModeBefore: "¿Quieres ver algo diferente,",
+      tryDevMode: "prueba el modo dev",
     },
     about: {
       eyebrow: "Sobre mí",

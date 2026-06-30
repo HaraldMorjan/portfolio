@@ -3,6 +3,7 @@ import { Code } from "astro:components";
 import { marked } from "marked";
 import { getPortfolio } from "../../data/portfolio";
 import { getUi, DEFAULT_LANG } from "../../data/i18n.js";
+import { BLUE_ACCENT } from "../../data/signatureTheme.js";
 import { lighthouse, reportUrl } from "../../data/lighthouse.js";
 import SocialLinks from "../SocialLinks.astro";
 import StackContent from "../sections/StackContent.astro";
@@ -54,6 +55,7 @@ const githubUser = githubUrl.replace(/\/+$/, "").split("/").pop() || "";
 // Accent presets the `theme` command can switch to (mirrors Theme Studio).
 const themePresets = {
   default: "",
+  blue: BLUE_ACCENT,
   ocean: "#0ea5e9",
   sunset: "#f97316",
   forest: "#16a34a",

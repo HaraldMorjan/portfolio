@@ -1,5 +1,7 @@
 ---
 // Theme Studio: a live design-token editor.
+import { SIGNATURE_GREEN, BLUE_ACCENT, BLUE_HUE } from "../data/signatureTheme.js";
+
 // Overrides semantic CSS variables on <html> in real time, with presets,
 // a harmonious palette generator, font + radius controls, WCAG contrast
 // checks, copyable CSS export, persistence, and a shareable URL.
@@ -29,13 +31,14 @@ const fonts = [
 
 // name, accent color, neutral hue for the generated palette
 const presets = [
-  { name: "Default", reset: true, dot: "#1a66f0" },
-  { name: "Ocean", accent: "#0ea5e9", hue: 200, dot: "#0ea5e9" },
-  { name: "Sunset", accent: "#f97316", hue: 18, dot: "#f97316" },
-  { name: "Forest", accent: "#16a34a", hue: 150, dot: "#16a34a" },
-  { name: "Grape", accent: "#8b5cf6", hue: 265, dot: "#8b5cf6" },
-  { name: "Rose", accent: "#e11d48", hue: 350, dot: "#e11d48" },
-  { name: "Mono", accent: "#64748b", hue: 220, dot: "#64748b" },
+  { id: "default", name: "Default", reset: true, dot: SIGNATURE_GREEN },
+  { id: "blue", name: "Blue", accent: BLUE_ACCENT, hue: BLUE_HUE, dot: BLUE_ACCENT },
+  { id: "ocean", name: "Ocean", accent: "#0ea5e9", hue: 200, dot: "#0ea5e9" },
+  { id: "sunset", name: "Sunset", accent: "#f97316", hue: 18, dot: "#f97316" },
+  { id: "forest", name: "Forest", accent: "#16a34a", hue: 150, dot: "#16a34a" },
+  { id: "grape", name: "Grape", accent: "#8b5cf6", hue: 265, dot: "#8b5cf6" },
+  { id: "rose", name: "Rose", accent: "#e11d48", hue: 350, dot: "#e11d48" },
+  { id: "mono", name: "Mono", accent: "#64748b", hue: 220, dot: "#64748b" },
 ];
 ---
 
@@ -105,10 +108,12 @@ const presets = [
           presets.map((p) => (
             <button
               type="button"
-              class="cs-preset inline-flex items-center gap-1.5 rounded-full border border-border bg-bg px-3 py-1.5 text-sm text-text transition hover:border-accent"
+              class="cs-preset inline-flex items-center gap-1.5 rounded-full border border-border bg-bg px-3 py-1.5 text-sm text-text transition hover:border-accent data-[selected=true]:border-accent-strong data-[selected=true]:bg-accent-strong/10 data-[selected=true]:font-semibold data-[selected=true]:text-text data-[selected=true]:shadow-[inset_0_0_0_1px_color-mix(in_srgb,var(--accent-strong)_35%,transparent)]"
+              data-preset-id={p.id}
               data-reset={p.reset ? "true" : undefined}
               data-accent={p.accent}
               data-hue={p.hue?.toString()}
+              aria-pressed="false"
             >
               <span class="h-3 w-3 rounded-full" style={`background:${p.dot}`} />
               {p.name}
@@ -229,7 +234,7 @@ const presets = [
   // @ts-nocheck
   // ---- color helpers ------------------------------------------------------
   const VARS = ["--bg", "--surface", "--text", "--muted", "--border", "--accent"];
-  const MANAGED = [...VARS, "--accent-contrast", "--hover"];
+  const MANAGED = [...VARS, "--accent-contrast", "--accent-strong", "--hover"];
   const STORAGE_KEY = "theme-studio";
 
   function clamp(n, a, b) {
@@ -291,6 +296,30 @@ const presets = [
     return luminance(hex) > 0.45 ? "#0b1220" : "#ffffff";
   }
 
+  /** Darken accent until label contrast meets WCAG AA (4.5:1) on filled buttons. */
+  function accentStrongColor(accent, fg = "#ffffff") {
+    let hex = normalizeHex(accent);
+    if (contrast(hex, fg) >= 4.5) return hex;
+    for (let i = 0; i < 12; i++) {
+      const { r, g, b } = hexToRgb(hex);
+      hex = rgbToHex(r * 0.88, g * 0.88, b * 0.88);
+      if (contrast(hex, fg) >= 4.5) return hex;
+    }
+    return hex;
+  }
+
+  function buttonAccentBg() {
+    if (curVars()["--accent-strong"]) return normalizeHex(curVars()["--accent-strong"]);
+    const css = getComputedStyle(root).getPropertyValue("--accent-strong").trim();
+    if (css) return normalizeHex(css);
+    return cv("--accent");
+  }
+
+  function buttonAccentFg() {
+    if (curVars()["--accent-contrast"]) return normalizeHex(curVars()["--accent-contrast"]);
+    return contrastColor(buttonAccentBg());
+  }
+
   // ---- palette generation -------------------------------------------------
   function isDark() {
     return document.documentElement.classList.contains("dark");
@@ -301,9 +330,11 @@ const presets = [
 
   // Build a full palette for a given mode, tinted by the chosen hue.
   function buildPalette(accent, hue, dark) {
+    const accentContrast = contrastColor(accent);
     const vars = {
       "--accent": accent,
-      "--accent-contrast": contrastColor(accent),
+      "--accent-strong": accentStrongColor(accent, accentContrast),
+      "--accent-contrast": accentContrast,
       "--bg": hslToHex(hue, 30, dark ? 4 : 99),
       "--surface": hslToHex(hue, dark ? 28 : 32, dark ? 9 : 96),
       "--border": hslToHex(hue, dark ? 20 : 25, dark ? 18 : 88),
@@ -315,7 +346,42 @@ const presets = [
   }
 
   // ---- state --------------------------------------------------------------
-  let state = { light: {}, dark: {} };
+  let state = { light: {}, dark: {}, activePreset: "default" };
+
+  const PRESET_META = [
+    { id: "default", accent: null },
+    { id: "blue", accent: "#1a66f0" },
+    { id: "ocean", accent: "#0ea5e9" },
+    { id: "sunset", accent: "#f97316" },
+    { id: "forest", accent: "#16a34a" },
+    { id: "grape", accent: "#8b5cf6" },
+    { id: "rose", accent: "#e11d48" },
+    { id: "mono", accent: "#64748b" },
+  ];
+
+  function inferActivePreset() {
+    const hasStoredPalette =
+      Object.keys(state.light || {}).length > 0 || Object.keys(state.dark || {}).length > 0;
+    if (!hasStoredPalette && !localStorage.getItem(STORAGE_KEY)) return "default";
+    if (!hasStoredPalette) return "default";
+
+    const accent = state.light?.["--accent"] || state.dark?.["--accent"];
+    if (!accent) return "default";
+
+    const match = PRESET_META.find(
+      (p) => p.accent && normalizeHex(accent) === normalizeHex(p.accent),
+    );
+    return match?.id ?? null;
+  }
+
+  function syncPresetChips() {
+    const active = state.activePreset ?? inferActivePreset() ?? null;
+    document.querySelectorAll(".cs-preset").forEach((btn) => {
+      const selected = btn.dataset.presetId === active;
+      btn.dataset.selected = selected ? "true" : "false";
+      btn.setAttribute("aria-pressed", selected ? "true" : "false");
+    });
+  }
 
   const root = document.documentElement;
   const $ = (id) => document.getElementById(id);
@@ -376,6 +442,7 @@ const presets = [
 
     renderWcag();
     renderCss();
+    syncPresetChips();
   }
 
   function badge(label, ratio, big = false) {
@@ -400,7 +467,7 @@ const presets = [
     wrap.innerHTML =
       badge("Text / Background", contrast(cv("--text"), cv("--bg")), true) +
       badge("Muted / Background", contrast(cv("--muted"), cv("--bg"))) +
-      badge("Accent button", contrast(cv("--accent"), cv("--accent-contrast")));
+      badge("Accent button", contrast(buttonAccentBg(), buttonAccentFg()));
   }
 
   function renderCss() {
@@ -437,15 +504,24 @@ const presets = [
             dark: parsed.dark || {},
             font: parsed.font,
             radius: parsed.radius,
+            activePreset: parsed.activePreset,
           };
+          if (state.activePreset == null) state.activePreset = inferActivePreset();
         } else if (parsed) {
           // legacy flat format: keep only font/radius, drop ambiguous colors
-          state = { light: {}, dark: {}, font: parsed.font, radius: parsed.radius };
+          state = {
+            light: {},
+            dark: {},
+            font: parsed.font,
+            radius: parsed.radius,
+            activePreset: "default",
+          };
         }
       }
     } catch {
-      state = { light: {}, dark: {} };
+      state = { light: {}, dark: {}, activePreset: "default" };
     }
+    if (state.activePreset === undefined) state.activePreset = inferActivePreset();
     syncUI();
   }
 
@@ -490,6 +566,7 @@ const presets = [
           curVars()["--hover"] = `rgba(${r},${g},${b},0.08)`;
         }
       }
+      state.activePreset = null;
       applyState();
     });
   });
@@ -505,6 +582,7 @@ const presets = [
       const hue = parseFloat(btn.dataset.hue);
       state.light = buildPalette(accent, hue, false);
       state.dark = buildPalette(accent, hue, true);
+      state.activePreset = btn.dataset.presetId || null;
       applyState();
     });
   });
@@ -515,6 +593,7 @@ const presets = [
     const accent = hslToHex(hue, 70, isDark() ? 60 : 50);
     state.light = buildPalette(accent, hue, false);
     state.dark = buildPalette(accent, hue, true);
+    state.activePreset = null;
     applyState();
   });
 
@@ -546,7 +625,7 @@ const presets = [
 
   // reset
   function resetTheme() {
-    state = { light: {}, dark: {} };
+    state = { light: {}, dark: {}, activePreset: "default" };
     [...MANAGED, "--font-sans", "--radius-base"].forEach((v) => root.style.removeProperty(v));
     localStorage.removeItem(STORAGE_KEY);
     if (location.hash.includes("theme=")) {
