@@ -1,6 +1,11 @@
 # Dev Portfolio
 
+[![Deploy](https://github.com/HaraldMorjan/portfolio/actions/workflows/deploy.yml/badge.svg?branch=master)](https://github.com/HaraldMorjan/portfolio/actions/workflows/deploy.yml)
+[![Live](https://img.shields.io/website?url=https%3A%2F%2Fhmorjan.dev&label=hmorjan.dev)](https://hmorjan.dev)
+
 A modern, responsive developer portfolio built with [Astro](https://astro.build) and [Tailwind CSS v4](https://tailwindcss.com). The centerpiece is a categorized tech-stack showcase, with a dark/light theme toggle and a single-page anchored layout.
+
+Push to `master` deploys automatically to [hmorjan.dev](https://hmorjan.dev) via GitHub Actions → FTPS (DonDominio) → Cloudflare.
 
 ## Editing your content
 

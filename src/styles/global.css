@@ -78,6 +78,18 @@ body {
   @apply bg-bg text-text antialiased;
 }
 
+/* Preflight sets `cursor: default` on buttons; show pointer on clickable controls. */
+button:not(:disabled):not([aria-disabled="true"]),
+a[href],
+[role="button"]:not([aria-disabled="true"]),
+[role="switch"]:not([aria-disabled="true"]),
+[role="tab"],
+label[for],
+select:not(:disabled),
+summary {
+  cursor: pointer;
+}
+
 /* Smooth recolor when the theme changes live */
 @media (prefers-reduced-motion: no-preference) {
   body,

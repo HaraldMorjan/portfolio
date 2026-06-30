@@ -64,8 +64,66 @@ export const ui = {
     projects: {
       eyebrow: "Projects",
       title: "Things I've built",
-      intro: "A selection of projects that show how I think and what I can ship.",
+      intro:
+        "A selection of projects that show how I think and what I can ship. Every live demo gets the same treatment: push-to-deploy CI, a dedicated subdomain, and Cloudflare at the edge.",
+      shipping: {
+        eyebrow: "How I ship",
+        title: "Push to deploy, every time",
+        intro:
+          "I treat personal projects like production: one subdomain per product, automated builds, zero manual uploads, and Cloudflare in front of every public URL.",
+        steps: [
+          {
+            title: "Push",
+            description: "A merge to master triggers GitHub Actions in each repo.",
+          },
+          {
+            title: "Build",
+            description: "CI installs dependencies and runs the production build.",
+          },
+          {
+            title: "Deploy",
+            description: "FTPS uploads dist/ to the matching folder on DonDominio.",
+          },
+          {
+            title: "Live",
+            description: "Each app gets its own *.hmorjan.dev subdomain behind Cloudflare.",
+          },
+        ],
+        pipeline: "Pipeline",
+        cloudflare: {
+          eyebrow: "Edge layer",
+          title: "Cloudflare on every live demo",
+          intro:
+            "Spinning up a new project means wiring DNS and edge settings too — the same checklist every time, not a one-off for the portfolio.",
+          items: [
+            {
+              label: "Wildcard DNS",
+              detail: "Proxied * CNAME to DonDominio — one subdomain per product, no nested paths.",
+            },
+            {
+              label: "HTTPS at the edge",
+              detail: "Flexible SSL plus Always Use HTTPS; origin stays on shared hosting.",
+            },
+            {
+              label: "DDoS protection",
+              detail: "Orange-cloud proxy on every public site record.",
+            },
+            {
+              label: "DNS-only exceptions",
+              detail: "MX, SPF, and FTP stay grey-cloud so mail and CI deploys keep working.",
+            },
+          ],
+          everyProject: "Every live project below uses this same edge setup.",
+        },
+        workflowAlt: "Portfolio deploy workflow status on GitHub Actions",
+        viewPipeline: "View portfolio deploy workflow",
+      },
       featured: "Featured",
+      autoDeploy: "Auto-deploy",
+      cloudflareEdge: "Cloudflare edge",
+      cloudflareEdgeHint: (host) => `${host} served via Cloudflare proxy (HTTPS, DDoS protection)`,
+      workflowStatusAlt: (t) => `${t} deploy workflow status on GitHub Actions`,
+      viewWorkflow: (t) => `View ${t} GitHub Actions deploy workflow`,
       code: "Code",
       liveDemo: "Live demo",
       stack: "Stack",
@@ -131,8 +189,18 @@ export const ui = {
       welcome: "Welcome! Type {help} to get started.",
       helpHeader: "# available commands",
       skillsComment: "Flatten every category into a single skills list",
-      readmeExperience: "Experience",
-      readmeConnect: "Connect",
+      readmeAbout: "About",
+      readmeTopSkills: "Top skills",
+      readmeSeeAlso: "See also",
+      readmeSeeAlsoIntro:
+        "Work history, stack, projects, and contact live in their own tabs — this file is the narrative.",
+      readmePointerExperience:
+        "- **Experience** → `experience.md` or run `experience`",
+      readmePointerStack: "- **Stack** → `stack.md` or run `stack`",
+      readmePointerProjects: "- **Projects** → `projects.md` or run `projects`",
+      readmePointerAbout: "- **Profile (code)** → `about.ts` or run `about`",
+      readmePointerContact:
+        "- **Contact** → standard view Contact section, or run `contactme` / `socials`",
       help: {
         help: "show this help",
         whoami: "name and role",
@@ -261,8 +329,65 @@ export const ui = {
       eyebrow: "Proyectos",
       title: "Cosas que he construido",
       intro:
-        "Una selección de proyectos que muestran cómo pienso y lo que puedo entregar.",
+        "Una selección de proyectos que muestran cómo pienso y lo que puedo entregar. Cada demo en vivo recibe el mismo tratamiento: CI push-to-deploy, subdominio dedicado y Cloudflare en el edge.",
+      shipping: {
+        eyebrow: "Cómo publico",
+        title: "Push to deploy, siempre",
+        intro:
+          "Trato mis proyectos personales como producción: un subdominio por producto, builds automatizados, cero subidas manuales y Cloudflare delante de cada URL pública.",
+        steps: [
+          {
+            title: "Push",
+            description: "Un merge a master dispara GitHub Actions en cada repo.",
+          },
+          {
+            title: "Build",
+            description: "CI instala dependencias y ejecuta el build de producción.",
+          },
+          {
+            title: "Deploy",
+            description: "FTPS sube dist/ a la carpeta correspondiente en DonDominio.",
+          },
+          {
+            title: "Live",
+            description: "Cada app tiene su subdominio *.hmorjan.dev detrás de Cloudflare.",
+          },
+        ],
+        pipeline: "Pipeline",
+        cloudflare: {
+          eyebrow: "Capa edge",
+          title: "Cloudflare en cada demo en vivo",
+          intro:
+            "Levantar un proyecto nuevo incluye DNS y edge — la misma checklist cada vez, no un arreglo puntual del portafolio.",
+          items: [
+            {
+              label: "DNS wildcard",
+              detail: "CNAME * proxied a DonDominio — un subdominio por producto, sin rutas anidadas.",
+            },
+            {
+              label: "HTTPS en el edge",
+              detail: "SSL Flexible y Always Use HTTPS; el origen sigue en hosting compartido.",
+            },
+            {
+              label: "Protección DDoS",
+              detail: "Proxy nube naranja en cada registro de sitio público.",
+            },
+            {
+              label: "Excepciones DNS only",
+              detail: "MX, SPF y FTP en grey-cloud para que correo y deploys CI sigan funcionando.",
+            },
+          ],
+          everyProject: "Cada proyecto en vivo abajo usa esta misma configuración edge.",
+        },
+        workflowAlt: "Estado del workflow de deploy del portafolio en GitHub Actions",
+        viewPipeline: "Ver workflow de deploy del portafolio",
+      },
       featured: "Destacado",
+      autoDeploy: "Auto-deploy",
+      cloudflareEdge: "Cloudflare edge",
+      cloudflareEdgeHint: (host) => `${host} servido vía proxy Cloudflare (HTTPS, protección DDoS)`,
+      workflowStatusAlt: (t) => `Estado del workflow de deploy de ${t} en GitHub Actions`,
+      viewWorkflow: (t) => `Ver el workflow de deploy de ${t} en GitHub Actions`,
       code: "Código",
       liveDemo: "Demo en vivo",
       stack: "Stack",
@@ -328,8 +453,19 @@ export const ui = {
       welcome: "¡Bienvenido! Escribe {help} para empezar.",
       helpHeader: "# comandos disponibles",
       skillsComment: "Aplana cada categoría en una sola lista de habilidades",
-      readmeExperience: "Experiencia",
-      readmeConnect: "Contacto",
+      readmeAbout: "Sobre mí",
+      readmeTopSkills: "Principales habilidades",
+      readmeSeeAlso: "Ver también",
+      readmeSeeAlsoIntro:
+        "Experiencia, stack, proyectos y contacto tienen su propia pestaña — este archivo es la narrativa.",
+      readmePointerExperience:
+        "- **Experiencia** → `experience.md` o ejecuta `experience`",
+      readmePointerStack: "- **Stack** → `stack.md` o ejecuta `stack`",
+      readmePointerProjects:
+        "- **Proyectos** → `projects.md` o ejecuta `projects`",
+      readmePointerAbout: "- **Perfil (código)** → `about.ts` o ejecuta `about`",
+      readmePointerContact:
+        "- **Contacto** → sección Contacto en vista estándar, o ejecuta `contactme` / `socials`",
       help: {
         help: "muestra esta ayuda",
         whoami: "nombre y rol",

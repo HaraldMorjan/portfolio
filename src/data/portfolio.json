@@ -16,8 +16,8 @@
             "about": [
                 "I am a Senior Full-Stack Developer and Engineering Team Lead with nearly 12 years of experience building, scaling, and maintaining high-performance enterprise applications.",
                 "Throughout my career, I've evolved from a dedicated frontend specialist into a full-stack technical leader. I don't just write clean, scalable code — I build and mentor the teams that do. My technical expertise spans modern JavaScript architectures, robust .NET backends, and complex SQL Server database integrations.",
-                "I hold an MBA with a focus on Project Management, which lets me bridge the gap between engineering and business. I understand that code is just a tool; the ultimate goal is to solve business problems, generate revenue, and deliver seamless user experiences. I partner effectively with product owners and stakeholders to translate business requirements into technical reality while managing technical debt and delivery timelines.",
-                "I am passionate about clean architecture, solving complex enterprise challenges, and building cultures of engineering excellence."
+                "I am passionate about clean architecture, solving complex enterprise challenges, and building cultures of engineering excellence.",
+                "I hold an MBA with a focus on Project Management, which lets me bridge the gap between engineering and business. I understand that code is just a tool; the ultimate goal is to solve business problems, generate revenue, and deliver seamless user experiences. I partner effectively with product owners and stakeholders to translate business requirements into technical reality while managing technical debt and delivery timelines."
             ],
             "mobility": "Based in Guatemala with dual citizenship (including a German passport) — unrestricted work rights across the EU and ESTA visa-free travel to the US for business.",
             "topSkills": [
@@ -74,10 +74,11 @@
                 ]
             },
             {
-                "category": "AI",
-                "description": "AI-assisted development.",
+                "category": "Delivery",
+                "description": "Auto-deploy on push and Cloudflare edge on every live project.",
                 "items": [
-                    "GitHub Copilot"
+                    "GitHub Actions",
+                    "Cloudflare"
                 ]
             },
             {
@@ -101,6 +102,8 @@
                 ],
                 "repoUrl": "https://github.com/HaraldMorjan/sudoku",
                 "liveUrl": "https://sudoku.hmorjan.dev/",
+                "autoDeploy": true,
+                "cloudflareEdge": true,
                 "featured": true
             },
             {
@@ -115,6 +118,8 @@
                 ],
                 "repoUrl": "https://github.com/HaraldMorjan/focusstudio",
                 "liveUrl": "https://focus-studio.hmorjan.dev/",
+                "autoDeploy": true,
+                "cloudflareEdge": true,
                 "featured": true
             },
             {
@@ -143,6 +148,8 @@
                 ],
                 "repoUrl": "https://github.com/HaraldMorjan/scrumer",
                 "liveUrl": "https://scrumer.hmorjan.dev/",
+                "autoDeploy": true,
+                "cloudflareEdge": true,
                 "featured": true
             },
             {
@@ -157,6 +164,8 @@
                 ],
                 "repoUrl": "https://github.com/HaraldMorjan/regexlab",
                 "liveUrl": "https://regex-lab.hmorjan.dev/",
+                "autoDeploy": true,
+                "cloudflareEdge": true,
                 "featured": true
             },
             {
@@ -170,6 +179,8 @@
                 ],
                 "repoUrl": "https://github.com/HaraldMorjan/ops-console",
                 "liveUrl": "https://ops-console.hmorjan.dev/",
+                "autoDeploy": true,
+                "cloudflareEdge": true,
                 "featured": true
             },
             {
@@ -183,6 +194,8 @@
                 ],
                 "repoUrl": "https://github.com/HaraldMorjan/particle-studio",
                 "liveUrl": "https://particle-studio.hmorjan.dev/",
+                "autoDeploy": true,
+                "cloudflareEdge": true,
                 "featured": true
             },
             {
@@ -323,8 +336,8 @@
             "about": [
                 "Soy Desarrollador Full-Stack Senior y Líder Técnico de Equipo con casi 12 años de experiencia construyendo, escalando y manteniendo aplicaciones empresariales de alto rendimiento.",
                 "A lo largo de mi carrera evolucioné de especialista frontend dedicado a líder técnico full-stack. No solo escribo código limpio y escalable — construyo y formo a los equipos que lo hacen. Mi experiencia técnica abarca arquitecturas modernas de JavaScript, backends robustos en .NET e integraciones complejas con bases de datos SQL Server.",
-                "Tengo un MBA con enfoque en Gestión de Proyectos, lo que me permite tender un puente entre la ingeniería y el negocio. Entiendo que el código es solo una herramienta; el objetivo final es resolver problemas de negocio, generar ingresos y entregar experiencias de usuario impecables. Colaboro de forma efectiva con product owners y stakeholders para traducir requisitos de negocio en realidad técnica, gestionando la deuda técnica y los tiempos de entrega.",
-                "Me apasiona la arquitectura limpia, resolver retos empresariales complejos y construir culturas de excelencia en ingeniería."
+                "Me apasiona la arquitectura limpia, resolver retos empresariales complejos y construir culturas de excelencia en ingeniería.",
+                "Tengo un MBA con enfoque en Gestión de Proyectos, lo que me permite tender un puente entre la ingeniería y el negocio. Entiendo que el código es solo una herramienta; el objetivo final es resolver problemas de negocio, generar ingresos y entregar experiencias de usuario impecables. Colaboro de forma efectiva con product owners y stakeholders para traducir requisitos de negocio en realidad técnica, gestionando la deuda técnica y los tiempos de entrega."
             ],
             "mobility": "Radicado en Guatemala con doble nacionalidad (incluido pasaporte alemán) — derecho a trabajar sin restricciones en la UE y viajes de negocios a EE. UU. sin visa mediante ESTA.",
             "topSkills": [
@@ -381,10 +394,11 @@
                 ]
             },
             {
-                "category": "AI",
-                "description": "Desarrollo asistido por IA.",
+                "category": "Entrega",
+                "description": "Auto-deploy al push y Cloudflare edge en cada proyecto en vivo.",
                 "items": [
-                    "GitHub Copilot"
+                    "GitHub Actions",
+                    "Cloudflare"
                 ]
             },
             {
@@ -408,6 +422,8 @@
                 ],
                 "repoUrl": "https://github.com/HaraldMorjan/sudoku",
                 "liveUrl": "https://sudoku.hmorjan.dev/",
+                "autoDeploy": true,
+                "cloudflareEdge": true,
                 "featured": true
             },
             {
@@ -422,6 +438,8 @@
                 ],
                 "repoUrl": "https://github.com/HaraldMorjan/focusstudio",
                 "liveUrl": "https://focus-studio.hmorjan.dev/",
+                "autoDeploy": true,
+                "cloudflareEdge": true,
                 "featured": true
             },
             {
@@ -450,6 +468,8 @@
                 ],
                 "repoUrl": "https://github.com/HaraldMorjan/scrumer",
                 "liveUrl": "https://scrumer.hmorjan.dev/",
+                "autoDeploy": true,
+                "cloudflareEdge": true,
                 "featured": true
             },
             {
@@ -464,6 +484,8 @@
                 ],
                 "repoUrl": "https://github.com/HaraldMorjan/regexlab",
                 "liveUrl": "https://regex-lab.hmorjan.dev/",
+                "autoDeploy": true,
+                "cloudflareEdge": true,
                 "featured": true
             },
             {
@@ -477,6 +499,8 @@
                 ],
                 "repoUrl": "https://github.com/HaraldMorjan/ops-console",
                 "liveUrl": "https://ops-console.hmorjan.dev/",
+                "autoDeploy": true,
+                "cloudflareEdge": true,
                 "featured": true
             },
             {
@@ -490,6 +514,8 @@
                 ],
                 "repoUrl": "https://github.com/HaraldMorjan/particle-studio",
                 "liveUrl": "https://particle-studio.hmorjan.dev/",
+                "autoDeploy": true,
+                "cloudflareEdge": true,
                 "featured": true
             },
             {

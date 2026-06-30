@@ -102,32 +102,57 @@ export function projectsMd(p) {
   return `# Projects\n\n${body}\n`;
 }
 
-/** README.md - bio, experience and contact rendered as Markdown. */
+/** README.md - profile / about landing doc for the dev view (no duplicate experience or contact). */
 export function readmeMd(p, t = {}) {
-  const experienceHeading = t.readmeExperience || "Experience";
-  const connectHeading = t.readmeConnect || "Connect";
-  const experience = p.experience
-    .map((e) => `- **${e.role}** @ ${e.company} _(${e.period})_\n  ${e.description}`)
-    .join("\n");
+  const profile = p.profile;
+  const aboutHeading = t.readmeAbout || "About";
+  const topSkillsHeading = t.readmeTopSkills || "Top skills";
+  const seeAlsoHeading = t.readmeSeeAlso || "See also";
+  const seeAlsoIntro =
+    t.readmeSeeAlsoIntro ||
+    "Work history, stack, projects, and contact live in their own tabs — this file is the narrative.";
 
-  const socials = p.socials
-    .map((s) => `- **${s.label}:** ${s.href.replace(/^mailto:/, "")}`)
-    .join("\n");
+  const paragraphs =
+    profile.about && profile.about.length > 0 ? profile.about : [profile.bio];
+  const aboutBody = paragraphs.join("\n\n");
 
-  return `# ${p.profile.name}
+  const badges =
+    profile.badges && profile.badges.length > 0
+      ? `\n\n${profile.badges.map((b) => `\`${b}\``).join(" · ")}\n`
+      : "";
 
-> ${p.profile.tagline}
+  const mobility = profile.mobility ? `\n\n> ${profile.mobility}\n` : "";
 
-**${p.profile.role}** · ${p.profile.location}
+  const topSkills =
+    profile.topSkills && profile.topSkills.length > 0
+      ? `\n\n### ${topSkillsHeading}\n\n${profile.topSkills.map((s) => `- ${s}`).join("\n")}\n`
+      : "";
 
-${p.profile.bio}
+  const pointers = [
+    t.readmePointerExperience ||
+      "- **Experience** → `experience.md` or run `experience`",
+    t.readmePointerStack || "- **Stack** → `stack.md` or run `stack`",
+    t.readmePointerProjects ||
+      "- **Projects** → `projects.md` or run `projects`",
+    t.readmePointerAbout || "- **Profile (code)** → `about.ts` or run `about`",
+    t.readmePointerContact ||
+      "- **Contact** → standard view Contact section, or run `contactme` / `socials`",
+  ].join("\n");
 
-## ${experienceHeading}
+  return `# ${profile.name}
 
-${experience}
+> ${profile.tagline}
 
-## ${connectHeading}
+**${profile.role}** · ${profile.location}${badges}
 
-${socials}
+## ${aboutHeading}
+
+${aboutBody}${mobility}${topSkills}
+
+## ${seeAlsoHeading}
+
+${seeAlsoIntro}
+
+${pointers}
 `;
 }

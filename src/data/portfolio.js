@@ -25,6 +25,54 @@ export function getPortfolio(lang = DEFAULT_LANG) {
   };
 }
 
+export const PORTFOLIO_GITHUB_REPO = "HaraldMorjan/portfolio";
+export const DEFAULT_DEPLOY_BRANCH = "master";
+
+export function githubRepoFromUrl(repoUrl) {
+  const match = repoUrl?.match(/github\.com\/([^/]+\/[^/?#]+)/);
+  return match?.[1] ?? null;
+}
+
+/** GitHub Actions workflow URL for projects with autoDeploy enabled. */
+export function projectWorkflowUrl(project) {
+  if (!project?.autoDeploy || !project.repoUrl) return null;
+  if (project.workflowUrl) return project.workflowUrl;
+  return `${project.repoUrl.replace(/\/$/, "")}/actions/workflows/deploy.yml`;
+}
+
+/** shields.io-style GitHub Actions status badge for deploy.yml. */
+export function projectWorkflowBadgeUrl(project) {
+  const repo = githubRepoFromUrl(project?.repoUrl);
+  if (!project?.autoDeploy || !repo) return null;
+  const workflow = project.workflowFile ?? "deploy.yml";
+  const branch = project.deployBranch ?? DEFAULT_DEPLOY_BRANCH;
+  return `https://github.com/${repo}/actions/workflows/${workflow}/badge.svg?branch=${branch}`;
+}
+
+export function portfolioWorkflowUrl() {
+  return `https://github.com/${PORTFOLIO_GITHUB_REPO}/actions/workflows/deploy.yml`;
+}
+
+export function portfolioWorkflowBadgeUrl() {
+  return `https://github.com/${PORTFOLIO_GITHUB_REPO}/actions/workflows/deploy.yml/badge.svg?branch=${DEFAULT_DEPLOY_BRANCH}`;
+}
+
+/** Live demos on hmorjan.dev use the shared Cloudflare edge setup. */
+export function projectUsesCloudflareEdge(project) {
+  if (!project?.liveUrl?.trim()) return false;
+  if (project.cloudflareEdge === false) return false;
+  return project.cloudflareEdge === true || project.autoDeploy === true;
+}
+
+export function projectLiveHost(project) {
+  if (!project?.liveUrl) return "";
+  try {
+    return new URL(project.liveUrl).hostname;
+  } catch {
+    return project.liveUrl.replace(/^https?:\/\//, "").replace(/\/.*$/, "");
+  }
+}
+
 // Backward-compatible English exports.
 const en = getPortfolio(DEFAULT_LANG);
 

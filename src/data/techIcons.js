@@ -20,7 +20,9 @@ import {
   siMysql,
   siSocketdotio,
   siGithub,
+  siGithubactions,
   siGithubcopilot,
+  siCloudflare,
 } from "simple-icons";
 
 // Canonical tech name → official brand logo.
@@ -44,7 +46,9 @@ export const ICONS = {
   MySQL: siMysql,
   "Socket.IO": siSocketdotio,
   GitHub: siGithub,
+  "GitHub Actions": siGithubactions,
   "GitHub Copilot": siGithubcopilot,
+  Cloudflare: siCloudflare,
 };
 
 // Common alternative spellings (e.g. project tags) → canonical key.
@@ -75,6 +79,8 @@ const ALIASES = {
   "socket.io": "Socket.IO",
   socketio: "Socket.IO",
   github: "GitHub",
+  "github actions": "GitHub Actions",
+  cloudflare: "Cloudflare",
   "github copilot": "GitHub Copilot",
   copilot: "GitHub Copilot",
   "material ui": "Material UI",
